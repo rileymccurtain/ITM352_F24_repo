@@ -1,4 +1,6 @@
-{
+import json
+
+QUESTIONS = {
     "Which is the largest island of Japan?": {
         "options": ["a) Hokkaido", "b) Kyushu", "c) Honshu", "d) Shikoku"],
         "correct": "c"
@@ -40,3 +42,24 @@
         "correct": "c"
     }
 }
+
+# Specify the name of the JSON file.
+filename = "japanquiz.json"
+
+# Open the file in write mode and save the dictionary as JSON.
+with open(filename, "w") as DictFile:
+    json.dump(QUESTIONS, DictFile, indent=4)
+
+print(f"Data has been written to {filename}")
+
+# Read a file of questions and answers and save it as a dictionary.
+
+import json
+
+# Open the JSON file and load its content.
+with open('japanquiz.json', 'r') as DictFile:
+    data = json.load(DictFile)
+    
+# The "data" variable now holds the dictionary of questions.
+print("The question dictionary is:")
+print(data)
