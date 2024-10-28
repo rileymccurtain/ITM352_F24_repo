@@ -4,6 +4,7 @@ import pandas as pd
 import pyarrow  
 import ssl
 import time
+import sys
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -14,7 +15,6 @@ pd.set_option("display.max_rows", None)
 
 # Import the data file.  This needs to be downloaded to be used by Pandas.  
 # It is in CSV format.
-
 def load_csv(file_path):
     # Attempt to read the CSV file  
     try:
@@ -76,15 +76,51 @@ def display_rows(data):
         else:
             print("Invalid input. Please re-enter.")
 
+# Cleanly exit the program
+def exit_program(data):
+    sys.exit(0)
+
+# Display the top-level menu of user options
+def display_menu(data):
+    menu_options = (
+        ("Show the first n rows of data", display_rows),
+        ("Show the number of employees by region", employees_by_region),
+        ("Exit the program", exit_program)
+    )
+
+    print("\nPlease choose from among these options:")
+    for index, (description, _) in enumerate(menu_options):
+        print(f"{index+1}: {description}")
+
+    num_choices = len(menu_options)
+    choice = int(input(f"Select an option between 1 and {num_choices}: "))
+
+    if 1 <= choice <= num_choices:
+        action = menu_options[choice-1][1]
+        action(data)
+    else:
+        print("Invalid input. Please re-enter.")
+
+
+# Print the number of unique employees per region
+def employees_by_region(data):
+    pivot_table = pd.pivot_table(data, index="sales_region", values="employee_id",
+                                 aggfunc=pd.Series.nunique)
+    print("\nNumber of Employees by Region")
+    pivot_table.columns = ['Number of Employees']  # Rename the column for readability
+    print(pivot_table)
+    return pivot_table
+    
+
 # Call load_csv to load the file
-#url = "https://drive.google.com/uc?export=download&id=1Fv_vhoN4sTrUaozFPfzr0NCyHJLIeXEA"
-url = 'sales_data_test.csv'
+url = "https://drive.google.com/uc?export=download&id=1Fv_vhoN4sTrUaozFPfzr0NCyHJLIeXEA"
+#url = 'sales_data_test.csv'
 sales_data = load_csv(url)
 
 # Main loop for user interaction
 def main():
     while True:
-        display_rows(sales_data)
+        display_menu(sales_data)
 
 # If this is the main program, call main()
 if __name__ == "__main__":

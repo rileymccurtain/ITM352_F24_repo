@@ -47,7 +47,7 @@ def load_csv(file_path):
 
 # Call load_csv to load the file
 #url = "https://drive.google.com/uc?export=download&id=1Fv_vhoN4sTrUaozFPfzr0NCyHJLIeXEA"
-local_file = "sales_data_test17.csv"
+local_file = "sales_data_test.csv"
 sales_data = load_csv(local_file)
 
 if sales_data is not None:
