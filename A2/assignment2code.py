@@ -65,6 +65,7 @@ def summarize_data(data):
     print(f"Total Quantities Sold: {total_quantities}")
 
 # An option to export a DataFrame as an Excel file
+# The export procedures were developed utilizing ChatGPT by way of the prompt.
 def export_to_excel(df, filename):
     try:
         df.to_excel(filename, index=False)
@@ -91,11 +92,12 @@ def display_rows(data):
         print("Invalid input. Please enter a valid number or 'all'.")
 
 # Analytical tasks
+# ChatGPT provided assistance to this section in response to the prompt.
 def total_sales_by_region_and_order_type(data):
     result = pd.pivot_table(data, values='quantity', index='sales_region', columns='order_type', aggfunc='sum')
     print("\nTotal Sales by Region and Order Type")
     print(result)
-    if export_results(result): # The export procedures were developed utilizing ChatGPT by way of the prompt.
+    if export_results(result):
         filename = input("Enter the filename for the Excel export (e.g., results.xlsx): ")
         export_to_excel(result, filename)
 
@@ -246,7 +248,6 @@ def display_menu(data):
     ]
 
     # Remove menu options that are not applicable based on missing columns
-    # ChatGPT was heavily relied upon in response to a specific prompt concerning missing columns.
     if 'customer_state' not in data.columns:
         menu_options.remove(menu_options[2])  # Sales by customer type and order type by state
 
