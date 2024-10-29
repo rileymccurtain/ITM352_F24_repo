@@ -95,7 +95,7 @@ def total_sales_by_region_and_order_type(data):
     result = pd.pivot_table(data, values='quantity', index='sales_region', columns='order_type', aggfunc='sum')
     print("\nTotal Sales by Region and Order Type")
     print(result)
-    if export_results(result): # The export procedures were developed utilizing ChatGPT.
+    if export_results(result): # The export procedures were developed utilizing ChatGPT by way of the prompt.
         filename = input("Enter the filename for the Excel export (e.g., results.xlsx): ")
         export_to_excel(result, filename)
 
@@ -246,6 +246,7 @@ def display_menu(data):
     ]
 
     # Remove menu options that are not applicable based on missing columns
+    # ChatGPT was heavily relied upon in response to a specific prompt concerning missing columns.
     if 'customer_state' not in data.columns:
         menu_options.remove(menu_options[2])  # Sales by customer type and order type by state
 
