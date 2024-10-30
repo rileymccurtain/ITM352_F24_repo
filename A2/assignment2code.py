@@ -6,7 +6,10 @@ import time
 import sys
 
 ssl._create_default_https_context = ssl._create_unverified_context
+
+# Set the display to show all rows
 pd.set_option("display.max_rows", None)
+
 
 # Execute the CSV file operation
 # Import the data file.  This needs to be downloaded to be used by Pandas.  
@@ -16,6 +19,7 @@ def load_csv(file_path):
         print(f"Reading CSV file: {file_path}")
         start_time = time.time()
         # ChatGPT was used to generate fillna.
+        # This ensures that missing values are handled appropriately.
         sales_data = pd.read_csv(file_path, dtype_backend='pyarrow', on_bad_lines="skip").fillna(0)
         load_time = time.time() - start_time  
         print(f"File loaded in {load_time:.2f} seconds")
@@ -24,6 +28,8 @@ def load_csv(file_path):
         
         # Verify the column specifications
         required_columns = ['quantity', 'order_date', 'unit_price', 'sales_region', 'employee_id', 'order_type']
+        
+        # Check for missing columns
         missing_columns = [col for col in required_columns if col not in sales_data.columns]
         if missing_columns:
             print(f"Warning: Missing columns - {missing_columns}. Some analytics may not work.")
