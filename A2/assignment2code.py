@@ -9,7 +9,9 @@ ssl._create_default_https_context = ssl._create_unverified_context
 pd.set_option("display.max_rows", None)
 
 # Execute the CSV file operation
+# Import the data file.  This needs to be downloaded to be used by Pandas.  
 def load_csv(file_path):
+    # Attempt to read the CSV file  
     try:
         print(f"Reading CSV file: {file_path}")
         start_time = time.time()
@@ -148,6 +150,7 @@ def max_min_sales_price_by_category(data):
         filename = input("Enter the filename for the Excel export (e.g., results.xlsx): ")
         export_to_excel(result, filename)
 
+# Print the number of unique employees per region
 def employees_by_region(data):
     result = pd.pivot_table(data, index="sales_region", values="employee_id", aggfunc=pd.Series.nunique)
     print("\nNumber of Unique Employees by Region")
