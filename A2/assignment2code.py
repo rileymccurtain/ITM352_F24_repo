@@ -1,3 +1,4 @@
+# It is essential that all necessary libraries are present in order for the program to run.
 import pandas as pd
 import pyarrow
 import ssl
@@ -12,7 +13,8 @@ def load_csv(file_path):
     try:
         print(f"Reading CSV file: {file_path}")
         start_time = time.time()
-        sales_data = pd.read_csv(file_path, dtype_backend='pyarrow', on_bad_lines="skip").fillna(0) # ChatGPT was used to generate fillna.
+        # ChatGPT was used to generate fillna.
+        sales_data = pd.read_csv(file_path, dtype_backend='pyarrow', on_bad_lines="skip").fillna(0)
         load_time = time.time() - start_time  
         print(f"File loaded in {load_time:.2f} seconds")
         print(f"Number of rows: {len(sales_data)}")
@@ -24,7 +26,8 @@ def load_csv(file_path):
         if missing_columns:
             print(f"Warning: Missing columns - {missing_columns}. Some analytics may not work.")
         
-        sales_data['order_date'] = pd.to_datetime(sales_data['order_date'], errors='coerce')
+        # Ask Pandas to parse the order_date field into a standard representation
+        sales_data['order_date'] = pd.to_datetime(sales_data['order_date'], format="mixed")
 
         # Sales data summary
         summarize_data(sales_data)
@@ -236,7 +239,7 @@ def export_results(result):
 def display_menu(data):
     menu_options = [
         ("Show the first n rows of sales data", display_rows),
-        ("Total sales by region and order_type", total_sales_by_region_and_order_type),
+        ("Total sales by region and order type", total_sales_by_region_and_order_type),
         ("Average sales by region with average sales by state and sale type", average_sales_by_region_and_average_sales_by_state_and_sale_type),
         ("Sales by customer type and order type by state", sales_by_customer_type_and_order_type_by_state),
         ("Total sales quantity and price by region and product", total_sales_quantity_and_price_by_region_and_product),
@@ -249,10 +252,10 @@ def display_menu(data):
 
     # Remove menu options that are not applicable based on missing columns
     if 'customer_state' not in data.columns:
-        menu_options.remove(menu_options[2])  # Sales by customer type and order type by state
+        menu_options.remove(menu_options[2]) # Sales by customer type and order type by state
 
     if 'product_category' not in data.columns:
-        menu_options.remove(menu_options[3])  # Total sales quantity and price by region and product
+        menu_options.remove(menu_options[3]) # Total sales quantity and price by region and product
 
     print("\n--- Sales Data Dashboard ---")
     for index, (description, _) in enumerate(menu_options):
