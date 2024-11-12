@@ -68,16 +68,16 @@ def quiz():
     if 'username' not in session:
         return redirect(url_for('login'))  # If not logged in, redirect to login
 
+    # Initialize session variables if it's the first visit to the quiz
     if 'score' not in session:
         session['score'] = 0
         session['question_num'] = 0
         session['start_time'] = time.time()  # Record start time of the quiz
-
-        # Randomize the question order
-        session['questions'] = random.sample(question_list, len(question_list))
+        session['questions'] = random.sample(question_list, len(question_list))  # Randomize questions order
 
     feedback = None  # Initialize feedback variable
 
+    # Check if the user has answered the current question
     if request.method == 'POST':
         selected_answer = request.form.get('answer')
         current_question = session['questions'][session['question_num']]
@@ -87,21 +87,40 @@ def quiz():
         session[f'answer_{session["question_num"]}'] = selected_answer
         if selected_answer == correct_answer:
             session['score'] += 1
-            feedback = "Correct!"  # Provide positive feedback
+            feedback = f"Correct! The correct answer is: {correct_answer}"  # Positive feedback
         else:
-            feedback = f"Incorrect! The correct answer is: {correct_answer}"  # Provide corrective feedback
+            feedback = f"Incorrect! The correct answer is: {correct_answer}"  # Corrective feedback
 
         session['question_num'] += 1
 
+        # If all questions are answered, go to the result page
         if session['question_num'] >= len(session['questions']):
             return redirect(url_for('result'))
 
-        return redirect(url_for('quiz'))
+        # After submitting, render the next question
+        current_question = session['questions'][session['question_num']]
+        random_options = random.sample(current_question[1]['options'], len(current_question[1]['options']))
+
+        return render_template('quiz.html', num=session['question_num'] + 1, 
+                               question=current_question[0], 
+                               options=random_options, 
+                               feedback=feedback)
 
     # For GET request, fetch current question and options
     current_question = session['questions'][session['question_num']]
     random_options = random.sample(current_question[1]['options'], len(current_question[1]['options']))
 
+    return render_template('quiz.html', num=session['question_num'] + 1, 
+                           question=current_question[0], 
+                           options=random_options, 
+                           feedback=feedback)
+
+
+    # For GET request, fetch current question and options
+    current_question = session['questions'][session['question_num']]
+    random_options = random.sample(current_question[1]['options'], len(current_question[1]['options']))
+
+    # Pass feedback and current question to the template
     return render_template('quiz.html', num=session['question_num'] + 1, 
                            question=current_question[0], options=random_options, 
                            feedback=feedback)  # Pass feedback to template

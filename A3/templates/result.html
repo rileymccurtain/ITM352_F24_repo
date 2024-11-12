@@ -82,7 +82,7 @@
         <p>Your score: {{ score }} out of 10</p>
         <p>Time taken: {{ '%.2f' | format(time_taken) }} seconds</p>
 
-        <!-- Conditional Message with Emojis -->
+        <!-- Conditional Messages -->
         <p class="message" aria-live="polite">
             {% if score == 10 %}
                 Perfect score! Amazing work!
