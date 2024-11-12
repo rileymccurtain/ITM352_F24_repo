@@ -79,8 +79,13 @@
         <h1>Your Quiz Result</h1>
 
         <!-- Score Display -->
-        <p>Your score: {{ score }} out of 10</p>
-        <p>Time taken: {{ '%.2f' | format(time_taken) }} seconds</p>
+        <p>Your score: {{ score }} out of {{ questions|length }}</p>
+        
+        {% if time_taken is not none %}
+            <p>Time taken: {{ '%.2f' | format(time_taken) }} seconds</p>
+        {% else %}
+            <p>Time taken: Not available</p>
+        {% endif %}
 
         <!-- Conditional Messages -->
         <p class="message" aria-live="polite">
@@ -96,11 +101,11 @@
         </p>
 
         <!-- Areas for Improvement -->
-        {% if incorrect_questions %}
+        {% if areas_for_improvement %}
             <div class="areas-for-improvement">
                 <h3>Areas for Improvement</h3>
                 <ul>
-                    {% for question in incorrect_questions %}
+                    {% for question in areas_for_improvement %}
                         <li>{{ question }}</li>
                     {% endfor %}
                 </ul>

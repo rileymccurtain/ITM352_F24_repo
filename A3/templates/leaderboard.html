@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
-</head>
-<body>
-    <h1>Leaderboard</h1>
-    <ol>
-        {% for entry in leaderboard %}
-            <li>{{ entry.name }}: {{ entry.score }}</li>
-        {% endfor %}
-    </ol>
-    <a href="{{ url_for('home') }}">Back to Home</a>
-</body>
-</html>
+<h3>Leaderboard</h3>
+<ul>
+    {% for rank, (user, scores) in enumerate(leaderboard) %}
+        <li>{{ rank + 1 }}. {{ user }} - High Score: {{ max(scores) }}</li>
+    {% endfor %}
+</ul>
+
+{% if user_rank %}
+    <p>Your current rank: {{ user_rank }} with a score of {{ user_score }}</p>
+{% else %}
+    <p>You have not participated yet!</p>
+{% endif %}

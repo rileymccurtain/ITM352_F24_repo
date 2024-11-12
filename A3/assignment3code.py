@@ -10,6 +10,9 @@ app.secret_key = os.getenv('SECRET_KEY', 'your_default_secret_key')  # Set secre
 # In-memory store for users (for simplicity)
 USERS = {"port": "port123", "kazman": "kazman123"}
 
+# Global leaderboard dictionary (you could also use a file or a database)
+LEADERBOARD = {}
+
 # Load questions from JSON file
 def load_questions(file_path):
     try:
@@ -23,9 +26,43 @@ def load_questions(file_path):
 # Initialize question list
 question_list = load_questions("A3/japanquizquestions.json")
 
+# Load leaderboard data from file (if it exists)
+def load_leaderboard():
+    if os.path.exists('leaderboard.json'):
+        with open('leaderboard.json', 'r') as f:
+            return json.load(f)
+    return {}
+
+# Save leaderboard to file
+def save_leaderboard():
+    with open('leaderboard.json', 'w') as f:
+        json.dump(LEADERBOARD, f)
+
+# Initialize leaderboard
+LEADERBOARD = load_leaderboard()
+
 @app.route("/")
 def home():
-    return render_template('home.html')
+    username = session.get('username')
+    if username:
+        # User is returning, show score history
+        score_history = session.get('score_history', [])
+        return render_template('home.html', username=username, score_history=score_history)
+    else:
+        # First-time visitor, ask for name
+        return redirect(url_for('get_username'))
+
+# Username Route
+@app.route("/get_username", methods=["GET", "POST"])
+def get_username():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        session['username'] = username
+        session['score_history'] = []  # Initialize score history
+        flash("Welcome, {}!".format(username), "success")
+        return redirect(url_for('quiz'))
+    
+    return render_template('get_username.html')
 
 # Registration route (optional, if you want registration functionality as well)
 @app.route("/register", methods=["GET", "POST"])
@@ -63,6 +100,7 @@ def login():
     return render_template('login.html')
 
 # Quiz route
+
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
     if 'username' not in session:
@@ -73,7 +111,10 @@ def quiz():
         session['score'] = 0
         session['question_num'] = 0
         session['start_time'] = time.time()  # Record start time of the quiz
-        session['questions'] = random.sample(question_list, len(question_list))  # Randomize questions order
+        
+        # Initialize questions if not already in session
+        if 'questions' not in session:
+            session['questions'] = random.sample(question_list, len(question_list))  # Randomize questions order
 
     feedback = None  # Initialize feedback variable
 
@@ -115,34 +156,51 @@ def quiz():
                            options=random_options, 
                            feedback=feedback)
 
-
-    # For GET request, fetch current question and options
-    current_question = session['questions'][session['question_num']]
-    random_options = random.sample(current_question[1]['options'], len(current_question[1]['options']))
-
-    # Pass feedback and current question to the template
-    return render_template('quiz.html', num=session['question_num'] + 1, 
-                           question=current_question[0], options=random_options, 
-                           feedback=feedback)  # Pass feedback to template
-
 # Result route
 @app.route('/result')
 def result():
     score = session.pop('score', 0)
-    question_num = session.pop('question_num', None)  # Reset question number for new attempts
-    start_time = session.pop('start_time', None)
-    end_time = time.time()  # Record end time of the quiz
-    time_taken = end_time - start_time  # Time taken in seconds
+    username = session.get('username')
 
-    # Calculate areas for improvement (questions that were answered incorrectly)
-    incorrect_questions = []
-    for i, question in enumerate(session.get('questions', [])):
-        selected_answer = session.get(f'answer_{i}')
-        if selected_answer != question[1]['correct']:
-            incorrect_questions.append(question[0])
+    # Calculate the time taken
+    start_time = session.pop('start_time', time.time())
+    time_taken = time.time() - start_time
 
-    return render_template('result.html', score=score, time_taken=time_taken, 
-                           incorrect_questions=incorrect_questions)
+    # Get the 'questions' from session; ensure it exists
+    questions = session.get('questions', [])
+
+    # Calculate areas for improvement
+    areas_for_improvement = []
+    if questions:
+        for question_num in range(len(questions)):
+            selected_answer = session.get(f'answer_{question_num}')
+            correct_answer = questions[question_num][1]['correct']
+            if selected_answer != correct_answer:
+                areas_for_improvement.append(questions[question_num][0])  # Add incorrect questions
+
+    # Save score to history
+    score_history = session.get('score_history', [])
+    score_history.append(score)
+    session['score_history'] = score_history  # Save updated history back to session
+
+    # Update leaderboard
+    if username not in LEADERBOARD:
+        LEADERBOARD[username] = []
+
+    LEADERBOARD[username].append(score)  # Add the latest score
+    LEADERBOARD[username].sort(reverse=True)  # Sort in descending order
+
+    # Save leaderboard data
+    save_leaderboard()
+
+    # Get top 10 users by highest score
+    leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
+
+    session.pop('question_num', None)  # Reset for next attempt
+    session.pop('questions', None)
+
+    return render_template('result.html', score=score, leaderboard=leaderboard_sorted, 
+                           areas_for_improvement=areas_for_improvement, time_taken=time_taken, questions=questions)
 
 # Success route
 @app.route('/success')
@@ -150,6 +208,19 @@ def success():
     if 'username' not in session:
         return redirect(url_for('login'))  # If not logged in, redirect to login
     return render_template('success.html', username=session['username'])
+
+# Leaderboard route
+@app.route('/leaderboard')
+def leaderboard():
+    # Get the top 10 users from leaderboard
+    leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
+    
+    # Get current user's ranking
+    username = session.get('username')
+    user_score = max(LEADERBOARD.get(username, [0])) if username else 0
+    user_rank = next((rank for rank, (user, _) in enumerate(leaderboard_sorted, 1) if user == username), None)
+
+    return render_template('leaderboard.html', leaderboard=leaderboard_sorted, user_rank=user_rank, user_score=user_score)
 
 # Run the application
 if __name__ == "__main__":
