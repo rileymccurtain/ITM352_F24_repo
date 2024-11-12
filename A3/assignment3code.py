@@ -10,9 +10,6 @@ app.secret_key = os.getenv('SECRET_KEY', 'your_default_secret_key')  # Set secre
 # In-memory store for users (for simplicity)
 USERS = {"port": "port123", "kazman": "kazman123"}
 
-# Global leaderboard (for demonstration purposes, this could be stored in a database)
-leaderboard = []
-
 # Load questions from JSON file
 def load_questions(file_path):
     try:
@@ -59,23 +56,11 @@ def login():
         # Check the username and password. If successful, take the user to the quiz page
         if USERS.get(userid) == userpass:
             session['username'] = userid  # Store the username in session
-            # Check if it's the user's first visit
-            if 'visited_before' not in session:
-                session['visited_before'] = True
-                return redirect(url_for('welcome_back'))
             return redirect(url_for('quiz'))
         else:
             flash("Invalid username or password. Please try again.", "danger")
             return redirect(url_for('login'))
     return render_template('login.html')
-
-# Welcome back page
-@app.route('/welcome_back')
-def welcome_back():
-    username = session['username']
-    # Fetch user's previous score history (if any)
-    score_history = session.get('score_history', [])
-    return render_template('welcome_back.html', username=username, score_history=score_history)
 
 # Quiz route
 @app.route('/quiz', methods=['GET', 'POST'])
@@ -130,8 +115,18 @@ def quiz():
                            options=random_options, 
                            feedback=feedback)
 
+
+    # For GET request, fetch current question and options
+    current_question = session['questions'][session['question_num']]
+    random_options = random.sample(current_question[1]['options'], len(current_question[1]['options']))
+
+    # Pass feedback and current question to the template
+    return render_template('quiz.html', num=session['question_num'] + 1, 
+                           question=current_question[0], options=random_options, 
+                           feedback=feedback)  # Pass feedback to template
+
 # Result route
-@app.route('/result', methods=['GET', 'POST'])
+@app.route('/result')
 def result():
     score = session.pop('score', 0)
     question_num = session.pop('question_num', None)  # Reset question number for new attempts
@@ -139,26 +134,15 @@ def result():
     end_time = time.time()  # Record end time of the quiz
     time_taken = end_time - start_time  # Time taken in seconds
 
-    # Save the user's score history in session
-    if 'score_history' not in session:
-        session['score_history'] = []
-    session['score_history'].append({'score': score, 'time_taken': time_taken})
+    # Calculate areas for improvement (questions that were answered incorrectly)
+    incorrect_questions = []
+    for i, question in enumerate(session.get('questions', [])):
+        selected_answer = session.get(f'answer_{i}')
+        if selected_answer != question[1]['correct']:
+            incorrect_questions.append(question[0])
 
-    # Ask for the user's name to record their score in the leaderboard
-    if request.method == 'POST':
-        username = session['username']
-        leaderboard.append({'name': username, 'score': score})
-        leaderboard.sort(key=lambda x: x['score'], reverse=True)  # Sort leaderboard by score
-        return redirect(url_for('leaderboard'))
-
-    return render_template('result.html', score=score, time_taken=time_taken)
-
-# Leaderboard route
-@app.route('/leaderboard')
-def leaderboard_page():
-    # Show the top 10 leaderboard
-    top_scores = leaderboard[:10]
-    return render_template('leaderboard.html', leaderboard=top_scores)
+    return render_template('result.html', score=score, time_taken=time_taken, 
+                           incorrect_questions=incorrect_questions)
 
 # Success route
 @app.route('/success')
