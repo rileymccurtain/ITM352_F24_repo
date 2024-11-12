@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back</title>
+</head>
+<body>
+    <h1>Welcome back, {{ username }}!</h1>
+    <h2>Your Quiz Score History:</h2>
+    <ul>
+        {% for history in score_history %}
+            <li>Score: {{ history.score }} (Time: {{ history.time_taken }} seconds)</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('quiz') }}">Start New Quiz</a>
+</body>
+</html>
