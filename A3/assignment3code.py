@@ -87,9 +87,9 @@ def quiz():
         session[f'answer_{session["question_num"]}'] = selected_answer
         if selected_answer == correct_answer:
             session['score'] += 1
-            feedback = f"Correct! The correct answer is: {correct_answer}"  # Positive feedback
+            feedback = f"Correct!"  # Positive feedback
         else:
-            feedback = f"Incorrect! The correct answer is: {correct_answer}"  # Corrective feedback
+            feedback = f"Incorrect!"  # Corrective feedback
 
         session['question_num'] += 1
 
