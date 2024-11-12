@@ -27,13 +27,33 @@
         h1 {
             font-size: 2em;
             color: #333;
+            margin-bottom: 10px;
         }
         p {
             font-size: 1.4em;
             color: #555;
             margin: 20px 0;
         }
-        a {
+        .message {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .areas-for-improvement {
+            font-size: 1.2em;
+            color: #d9534f;
+            margin-top: 20px;
+        }
+        .areas-for-improvement ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .areas-for-improvement li {
+            font-size: 1.1em;
+            color: #d9534f;
+            margin-bottom: 10px;
+        }
+        .back-button {
             display: inline-block;
             padding: 10px 20px;
             font-size: 1.2em;
@@ -41,8 +61,9 @@
             background-color: #007bff;
             text-decoration: none;
             border-radius: 5px;
+            margin-top: 20px;
         }
-        a:hover {
+        .back-button:hover {
             background-color: #0056b3;
         }
     </style>
@@ -50,8 +71,38 @@
 <body>
     <div class="result-container">
         <h1>Your Quiz Result</h1>
+
+        <!-- Score Display -->
         <p>Your score: {{ score }} out of 10</p>
-        <a href="{{ url_for('home') }}">Take Quiz Again</a>
+        <p>Time taken: {{ '%.2f' | format(time_taken) }} seconds</p>
+
+        <!-- Conditional Message -->
+        <p class="message">
+            {% if score == 10 %}
+                Perfect score! Amazing work!
+            {% elif score >= 7 %}
+                Great job! You scored high!
+            {% elif score >= 4 %}
+                Good effort! Try again to improve!
+            {% else %}
+                Keep practicing, you can do it!
+            {% endif %}
+        </p>
+
+        <!-- Areas for Improvement -->
+        {% if incorrect_questions %}
+            <div class="areas-for-improvement">
+                <h3>Areas for Improvement</h3>
+                <ul>
+                    {% for question in incorrect_questions %}
+                        <li>{{ question }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Button to Take Quiz Again -->
+        <a href="{{ url_for('home') }}" class="back-button">Take Quiz Again</a>
     </div>
 </body>
 </html>

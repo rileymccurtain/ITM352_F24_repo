@@ -18,6 +18,7 @@
         }
         h1 {
             color: #333;
+            font-size: 2.5vw; /* Adjust font size responsively */
         }
         a {
             display: inline-block;
@@ -27,14 +28,22 @@
             text-decoration: none;
             border-radius: 5px;
             font-size: 1.2em;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         a:hover {
             background-color: #0056b3;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        a:focus {
+            outline: none;
+            background-color: #0056b3;
+            box-shadow: 0px 0px 0px 4px rgba(0, 123, 255, 0.5);
         }
     </style>
 </head>
 <body>
     <h1>Welcome to the Quiz!</h1>
-    <a href="{{ url_for('quiz') }}">Start Quiz</a>
+    <a href="{{ url_for('quiz') }}" aria-label="Start the Quiz">Start Quiz</a>
 </body>
 </html>

@@ -5,65 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /* Add some simple styling for feedback */
+        .feedback {
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
         }
-        .quiz-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
+        .correct {
+            color: green;
         }
-        h2 {
-            font-size: 1.8em;
-            color: #333;
-        }
-        .options {
-            text-align: left;
-            margin-top: 20px;
-        }
-        input[type="radio"] {
-            margin-right: 10px;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 1.1em;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
+        .incorrect {
+            color: red;
         }
     </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <h2>Question {{ num }}: {{ question }}</h2>
-        <form method="POST">
-            <div class="options">
-                {% for option in options %}
-                    <label>
-                        <input type="radio" name="answer" value="{{ option[0] }}"> <!-- Use only the letter as value -->
-                        {{ option }}
-                    </label><br>
-                {% endfor %}
+    <h1>Question {{ num }}</h1>
+    <p>{{ question }}</p>
+
+    <form method="POST">
+        {% for option in options %}
+            <div>
+                <input type="radio" id="{{ option }}" name="answer" value="{{ option }}" required>
+                <label for="{{ option }}">{{ option }}</label>
             </div>
-            <button type="submit">Submit Answer</button>
-        </form>
-    </div>
+        {% endfor %}
+        <button type="submit">Submit Answer</button>
+    </form>
+
+    {% if feedback %}
+        <div class="feedback {% if 'Incorrect' in feedback %}incorrect{% else %}correct{% endif %}">
+            {{ feedback }}
+        </div>
+    {% endif %}
 </body>
 </html>

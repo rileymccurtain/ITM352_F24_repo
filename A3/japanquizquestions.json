@@ -1,92 +1,92 @@
 {
-     "Which is the largest island of Japan?": {
-         "options": [
-             "a) Hokkaido",
-             "b) Kyushu",
-             "c) Honshu",
-             "d) Shikoku"
-         ],
-         "correct": "c"
-     },
-     "What is the tallest mountain in Japan?": {
-         "options": [
-             "a) Mount Fuji",
-             "b) Mount Kita",
-             "c) Mount Haku",
-             "d) Mount Asama"
-         ],
-         "correct": "a"
-     },
-     "Which sea lies to the east of Japan?": {
-         "options": [
-             "a) Sea of Japan",
-             "b) Pacific Ocean",
-             "c) Bering Sea",
-             "d) East China Sea"
-         ],
-         "correct": "b"
-     },
-     "Which river is the longest in Japan?": {
-         "options": [
-             "a) Tone River",
-             "b) Kiso River",
-             "c) Yamato River",
-             "d) Shinano River"
-         ],
-         "correct": "d"
-     },
-     "What is the name of the famous volcano located near Tokyo?": {
-         "options": [
-             "a) Mount Fuji",
-             "b) Mount Aso",
-             "c) Mount Sakurajima",
-             "d) Mount Unzen"
-         ],
-         "correct": "a"
-     },
-     "What type of natural disaster is Japan most famous for experiencing?": {
-         "options": [
-             "a) Earthquakes",
-             "b) Tsunamis",
-             "c) Volcanoes",
-             "d) Typhoons"
-         ],
-         "correct": "a"
-     },
-     "Which Japanese island is known for its hot springs (onsen)?": {
-         "options": [
-             "a) Hokkaido",
-             "b) Kyushu",
-             "c) Okinawa",
-             "d) Honshu"
-         ],
-         "correct": "b"
-     },
-     "What is the name of the traditional Japanese architecture characterized by wooden structures?": {
-         "options": [
-             "a) Pagoda",
-             "b) Castle",
-             "c) Shrine",
-             "d) Teahouse"
-         ],
-         "correct": "a"
-     },
-     "What is the predominant language spoken in Japan?": {
-         "options": [
-             "a) Chinese",
-             "b) Korean",
-             "c) English",
-             "d) Japanese"
-         ],
-         "correct": "d"
-     },
-     "Which city is known as the 'Gateway to Japan'?": {
-         "options": [
-             "a) Tokyo",
-             "b) Osaka",
-             "c) Yokohama",
-             "d) Nagoya"
-         ],
-         "correct": "c"
-     }
- }
+    "Which is the largest island of Japan?": {
+        "options": [
+            "Hokkaido",
+            "Kyushu",
+            "Honshu",
+            "Shikoku"
+        ],
+        "correct": "Honshu"
+    },
+    "What is the tallest mountain in Japan?": {
+        "options": [
+            "Mount Fuji",
+            "Mount Kita",
+            "Mount Haku",
+            "Mount Asama"
+        ],
+        "correct": "Mount Fuji"
+    },
+    "Which sea lies to the east of Japan?": {
+        "options": [
+            "Sea of Japan",
+            "Pacific Ocean",
+            "Bering Sea",
+            "East China Sea"
+        ],
+        "correct": "Pacific Ocean"
+    },
+    "Which river is the longest in Japan?": {
+        "options": [
+            "Tone River",
+            "Kiso River",
+            "Yamato River",
+            "Shinano River"
+        ],
+        "correct": "Shinano River"
+    },
+    "What is the name of the famous volcano located near Tokyo?": {
+        "options": [
+            "Mount Fuji",
+            "Mount Aso",
+            "Mount Sakurajima",
+            "Mount Unzen"
+        ],
+        "correct": "Mount Fuji"
+    },
+    "What type of natural disaster is Japan most famous for experiencing?": {
+        "options": [
+            "Earthquakes",
+            "Tsunamis",
+            "Volcanoes",
+            "Typhoons"
+        ],
+        "correct": "Earthquakes"
+    },
+    "Which Japanese island is known for its hot springs (onsen)?": {
+        "options": [
+            "Hokkaido",
+            "Kyushu",
+            "Okinawa",
+            "Honshu"
+        ],
+        "correct": "Kyushu"
+    },
+    "What is the name of the traditional Japanese architecture characterized by wooden structures?": {
+        "options": [
+            "Pagoda",
+            "Castle",
+            "Shrine",
+            "Teahouse"
+        ],
+        "correct": "Pagoda"
+    },
+    "What is the predominant language spoken in Japan?": {
+        "options": [
+            "Chinese",
+            "Korean",
+            "English",
+            "Japanese"
+        ],
+        "correct": "Japanese"
+    },
+    "Which city is known as the 'Gateway to Japan'?": {
+        "options": [
+            "Tokyo",
+            "Osaka",
+            "Yokohama",
+            "Nagoya"
+        ],
+        "correct": "Yokohama"
+    }
+}
