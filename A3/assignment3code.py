@@ -7,10 +7,10 @@ import os
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your_default_secret_key')  # Set secret key from env variable
 
-# In-memory store for users (for simplicity)
-USERS = {"port": "port123", "kazman": "kazman123"}
+# In-memory store for users (for simplicity, only storing names)
+USERS = {}
 
-# Global leaderboard dictionary (you could also use a file or a database)
+# Global leaderboard dictionary (In-memory, no external file storage)
 LEADERBOARD = {}
 
 # Load questions from JSON file
@@ -26,21 +26,6 @@ def load_questions(file_path):
 # Initialize question list
 question_list = load_questions("A3/japanquizquestions.json")
 
-# Load leaderboard data from file (if it exists)
-def load_leaderboard():
-    if os.path.exists('leaderboard.json'):
-        with open('leaderboard.json', 'r') as f:
-            return json.load(f)
-    return {}
-
-# Save leaderboard to file
-def save_leaderboard():
-    with open('leaderboard.json', 'w') as f:
-        json.dump(LEADERBOARD, f)
-
-# Initialize leaderboard
-LEADERBOARD = load_leaderboard()
-
 @app.route("/")
 def home():
     username = session.get('username')
@@ -52,7 +37,6 @@ def home():
         # First-time visitor, ask for name
         return redirect(url_for('get_username'))
 
-# Username Route
 @app.route("/get_username", methods=["GET", "POST"])
 def get_username():
     if request.method == 'POST':
@@ -64,42 +48,36 @@ def get_username():
     
     return render_template('get_username.html')
 
-# Registration route (optional, if you want registration functionality as well)
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
-        password = request.form.get('password')
         
-        # Check if the username already exists
+        # Store the name in USERS (no password needed)
         if username in USERS:
-            flash("Username already exists. Please choose a different one.", "danger")
+            flash("Name already exists. Please choose a different one.", "danger")
             return redirect(url_for('register'))
         
-        # Store the new user
-        USERS[username] = password
+        USERS[username] = True  # Just storing the name
         flash("Registration successful! You can now log in.", "success")
         return redirect(url_for('login'))
 
     return render_template('register.html')
 
-# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        userid = request.form.get('username')
-        userpass = request.form.get('password')
+        username = request.form.get('username')
         
-        # Check the username and password. If successful, take the user to the quiz page
-        if USERS.get(userid) == userpass:
-            session['username'] = userid  # Store the username in session
+        # Check if the name exists
+        if username in USERS:
+            session['username'] = username  # Store the username in session
             return redirect(url_for('quiz'))
         else:
-            flash("Invalid username or password. Please try again.", "danger")
+            flash("Invalid name. Please try again.", "danger")
             return redirect(url_for('login'))
-    return render_template('login.html')
 
-# Quiz route
+    return render_template('login.html')
 
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
@@ -156,7 +134,6 @@ def quiz():
                            options=random_options, 
                            feedback=feedback)
 
-# Result route
 @app.route('/result')
 def result():
     score = session.pop('score', 0)
@@ -190,9 +167,6 @@ def result():
     LEADERBOARD[username].append(score)  # Add the latest score
     LEADERBOARD[username].sort(reverse=True)  # Sort in descending order
 
-    # Save leaderboard data
-    save_leaderboard()
-
     # Get top 10 users by highest score
     leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
 
@@ -202,26 +176,14 @@ def result():
     return render_template('result.html', score=score, leaderboard=leaderboard_sorted, 
                            areas_for_improvement=areas_for_improvement, time_taken=time_taken, questions=questions)
 
-# Success route
-@app.route('/success')
-def success():
-    if 'username' not in session:
-        return redirect(url_for('login'))  # If not logged in, redirect to login
-    return render_template('success.html', username=session['username'])
-
-# Leaderboard route
 @app.route('/leaderboard')
 def leaderboard():
-    # Get the top 10 users from leaderboard
     leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
-    
-    # Get current user's ranking
     username = session.get('username')
     user_score = max(LEADERBOARD.get(username, [0])) if username else 0
     user_rank = next((rank for rank, (user, _) in enumerate(leaderboard_sorted, 1) if user == username), None)
 
     return render_template('leaderboard.html', leaderboard=leaderboard_sorted, user_rank=user_rank, user_score=user_score)
 
-# Run the application
 if __name__ == "__main__":
     app.run(debug=True)

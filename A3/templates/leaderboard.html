@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Add your styles here */
+    </style>
 </head>
 <body>
     <h1>Leaderboard</h1>
-    <table border="1">
+    <table>
         <thead>
             <tr>
                 <th>Rank</th>
@@ -26,13 +28,13 @@
             {% endfor %}
         </tbody>
     </table>
-
+    
     {% if user_rank %}
-        <h2>Your Rank: #{{ user_rank }} with a score of {{ user_score }}</h2>
+        <h2>Your Rank: {{ user_rank }} (Score: {{ user_score }})</h2>
     {% else %}
-        <h2>You haven't completed a quiz yet.</h2>
+        <p>You are not yet ranked.</p>
     {% endif %}
-    <br>
+    
     <a href="{{ url_for('home') }}">Back to Home</a>
 </body>
 </html>
