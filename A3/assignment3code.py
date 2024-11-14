@@ -29,6 +29,7 @@ question_list = load_questions("A3/japanquizquestions.json")
 @app.route("/")
 def home():
     username = session.get('username')
+    print(f"In home: username={username}")
     if username:
         # User is returning, show score history
         score_history = session.get('score_history', [])
@@ -52,7 +53,7 @@ def get_username():
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
-        
+        print(f"USERS={USERS}")
         # Store the name in USERS (no password needed)
         if username in USERS:
             flash("Name already exists. Please choose a different one.", "danger")
