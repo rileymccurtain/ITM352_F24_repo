@@ -168,6 +168,8 @@ def result():
     LEADERBOARD[username].append(score)  # Add the latest score
     LEADERBOARD[username].sort(reverse=True)  # Sort in descending order
 
+    print(f"Updated LEADERBOARD: {LEADERBOARD}")
+
     # Get top 10 users by highest score
     leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
 
@@ -185,6 +187,8 @@ def leaderboard():
     user_rank = next((rank for rank, (user, _) in enumerate(leaderboard_sorted, 1) if user == username), None)
 
     return render_template('leaderboard.html', leaderboard=leaderboard_sorted, user_rank=user_rank, user_score=user_score)
+
+    print(f"Leaderboard data: {leaderboard_sorted}")
 
 if __name__ == "__main__":
     app.run(debug=True)
