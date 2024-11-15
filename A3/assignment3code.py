@@ -168,16 +168,22 @@ def result():
     LEADERBOARD[username].append(score)  # Add the latest score
     LEADERBOARD[username].sort(reverse=True)  # Sort in descending order
 
-    print(f"Updated LEADERBOARD: {LEADERBOARD}")
-
     # Get top 10 users by highest score
     leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
+
+    # Enumerate leaderboard for ranks in Python
+    leaderboard_with_rank = [(rank + 1, user, max(scores)) for rank, (user, scores) in enumerate(leaderboard_sorted)]
 
     session.pop('question_num', None)  # Reset for next attempt
     session.pop('questions', None)
 
-    return render_template('result.html', score=score, leaderboard=leaderboard_sorted, 
-                           areas_for_improvement=areas_for_improvement, time_taken=time_taken, questions=questions)
+    # Render template with leaderboard data
+    return render_template('result.html', 
+                           score=score, 
+                           leaderboard=leaderboard_with_rank, 
+                           areas_for_improvement=areas_for_improvement, 
+                           time_taken=time_taken, 
+                           questions=questions)
 
 @app.route('/leaderboard')
 def leaderboard():

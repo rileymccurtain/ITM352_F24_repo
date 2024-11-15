@@ -54,6 +54,26 @@
             color: #d9534f;
             margin-bottom: 10px;
         }
+        .leaderboard-container {
+            margin-top: 40px;
+            font-size: 1.2em;
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .leaderboard-table th {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .leaderboard-table td {
+            background-color: #f9f9f9;
+        }
         .back-button {
             display: inline-block;
             padding: 10px 20px;
@@ -111,6 +131,31 @@
                 </ul>
             </div>
         {% endif %}
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-container">
+            <h2>Leaderboard</h2>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>Top Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set rank = 1 %}
+                    {% for entry in leaderboard %}
+                        <tr>
+                            <td>{{ rank }}</td>
+                            <td>{{ entry['username'] }}</td>
+                            <td>{{ entry['scores'] | max }}</td>  <!-- Show the highest score for the user -->
+                        </tr>
+                        {% set rank = rank + 1 %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <!-- Button to Take Quiz Again -->
         <a href="{{ url_for('home') }}" class="back-button">Take Quiz Again</a>
