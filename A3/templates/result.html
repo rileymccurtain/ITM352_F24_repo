@@ -145,11 +145,11 @@
                 </thead>
                 <tbody>
                     {% set rank = 1 %}
-                    {% for entry in leaderboard %}
+                    {% for username, score in leaderboard %}
                         <tr>
                             <td>{{ rank }}</td>
-                            <td>{{ entry['username'] }}</td>
-                            <td>{{ entry['scores'] | max }}</td>  <!-- Show the highest score for the user -->
+                            <td>{{ username }}</td>
+                            <td>{{ score }}</td>  <!-- Show the highest score for the user -->
                         </tr>
                         {% set rank = rank + 1 %}
                     {% endfor %}
