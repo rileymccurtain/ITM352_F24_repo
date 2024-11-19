@@ -85,11 +85,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for rank, (user, scores) in enumerate(leaderboard, 1) %}
+            {% for rank, (user, score) in enumerate(leaderboard, 1) %}
                 <tr>
                     <td>{{ rank }}</td>
                     <td>{{ user }}</td>
-                    <td>{{ max(scores) }}</td>
+                    <td>{{ score }}</td> <!-- Now displaying the score directly -->
                 </tr>
             {% endfor %}
         </tbody>

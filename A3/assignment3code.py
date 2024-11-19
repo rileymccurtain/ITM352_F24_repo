@@ -180,7 +180,7 @@ def result():
     # Render template with leaderboard data
     return render_template('result.html', 
                            score=score, 
-                           leaderboard=leaderboard_with_rank, 
+                           leaderboard=leaderboard_sorted, 
                            areas_for_improvement=areas_for_improvement, 
                            time_taken=time_taken, 
                            questions=questions)
