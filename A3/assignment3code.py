@@ -28,6 +28,7 @@ def load_questions(file_path):
 # Initialize question list
 question_list = load_questions("A3/japanquizquestions.json")
 
+# Through the prompt, ChatGPT provided valuable guidance to @app.route operations.
 @app.route("/")
 def home():
     username = session.get('username')
