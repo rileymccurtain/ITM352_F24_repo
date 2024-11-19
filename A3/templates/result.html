@@ -3,162 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Result</title>
+    <title>Quiz Results</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .result-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            animation: fadeIn 1s ease-in;
+            background-color: #f0f8ff; /* AliceBlue background */
+            color: #333; /* Dark gray text */
+            margin: 20px;
+            padding: 20px;
         }
         h1 {
-            font-size: 2em;
-            color: #333;
-            margin-bottom: 10px;
+            color: #2c3e50; /* Dark blue-gray */
         }
         p {
-            font-size: 1.4em;
-            color: #555;
-            margin: 20px 0;
-        }
-        .message {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .areas-for-improvement {
-            font-size: 1.2em;
-            color: #d9534f;
-            margin-top: 20px;
-        }
-        .areas-for-improvement ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .areas-for-improvement li {
             font-size: 1.1em;
-            color: #d9534f;
-            margin-bottom: 10px;
         }
-        .leaderboard-container {
-            margin-top: 40px;
-            font-size: 1.2em;
+        h3 {
+            color: #16a085; /* Greenish teal */
         }
-        .leaderboard-table {
+        ul {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        ul li {
+            margin: 5px 0;
+        }
+        table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #ffffff;
         }
-        .leaderboard-table th, .leaderboard-table td {
-            padding: 10px;
-            text-align: center;
+        table th, table td {
             border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
         }
-        .leaderboard-table th {
-            background-color: #007bff;
-            color: #fff;
+        table th {
+            background-color: #2c3e50; /* Dark blue-gray */
+            color: white;
         }
-        .leaderboard-table td {
+        table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 1.2em;
-            color: #fff;
-            background-color: #007bff;
+        a {
             text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            color: #3498db; /* Blue */
         }
-        .back-button:hover {
-            background-color: #0056b3;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        a:hover {
+            color: #2980b9; /* Darker blue */
         }
     </style>
 </head>
 <body>
-    <div class="result-container">
-        <h1>Your Quiz Result</h1>
+    <h1>Quiz Results</h1>
+    <p>Congratulations, <strong>{{ session.get('username', 'Player') }}</strong>!</p>
+    <p>Your Score: <strong>{{ score }}</strong></p>
+    <p>Time Taken: <strong>{{ time_taken // 60 }} minutes and {{ time_taken % 60 }} seconds</strong></p>
 
-        <!-- Score Display -->
-        <p>Your score: {{ score }} out of {{ questions|length }}</p>
-        
-        {% if time_taken is not none %}
-            <p>Time taken: {{ '%.2f' | format(time_taken) }} seconds</p>
-        {% else %}
-            <p>Time taken: Not available</p>
-        {% endif %}
+    {% if areas_for_improvement %}
+        <h3>Areas for Improvement:</h3>
+        <ul>
+            {% for question in areas_for_improvement %}
+                <li>{{ question }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color: #27ae60; font-weight: bold;">Great job! You answered all questions correctly!</p>
+    {% endif %}
 
-        <!-- Conditional Messages -->
-        <p class="message" aria-live="polite">
-            {% if score == 10 %}
-                Perfect score! Amazing work!
-            {% elif score >= 7 %}
-                Great job! You scored high!
-            {% elif score >= 4 %}
-                Good effort! Try again to improve!
-            {% else %}
-                Keep practicing, you can do it!
-            {% endif %}
-        </p>
+    <h3>Leaderboard</h3>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Username</th>
+            <th>Highest Score</th>
+        </tr>
+        {% for rank, username, high_score in leaderboard %}
+        <tr>
+            <td>{{ rank }}</td>
+            <td>{{ username }}</td>
+            <td>{{ high_score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
-        <!-- Areas for Improvement -->
-        {% if areas_for_improvement %}
-            <div class="areas-for-improvement">
-                <h3>Areas for Improvement</h3>
-                <ul>
-                    {% for question in areas_for_improvement %}
-                        <li>{{ question }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        <!-- Leaderboard -->
-        <div class="leaderboard-container">
-            <h2>Leaderboard</h2>
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Username</th>
-                        <th>Top Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set rank = 1 %}
-                    {% for username, score in leaderboard %}
-                        <tr>
-                            <td>{{ rank }}</td>
-                            <td>{{ username }}</td>
-                            <td>{{ score }}</td>  <!-- Show the highest score for the user -->
-                        </tr>
-                        {% set rank = rank + 1 %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Button to Take Quiz Again -->
-        <a href="{{ url_for('home') }}" class="back-button">Take Quiz Again</a>
-    </div>
+    <a href="{{ url_for('quiz') }}">Try Again</a> | <a href="{{ url_for('home') }}">Home</a>
 </body>
 </html>

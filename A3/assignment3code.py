@@ -165,11 +165,16 @@ def result():
     if username not in LEADERBOARD:
         LEADERBOARD[username] = []
 
-    LEADERBOARD[username].append(score)  # Add the latest score
-    LEADERBOARD[username].sort(reverse=True)  # Sort in descending order
+    # Update the user's scores and ensure max is accurate
+    LEADERBOARD[username].append(score)
+    max_score = max(LEADERBOARD[username])  # Recalculate the max score for the leaderboard
 
-    # Get top 10 users by highest score
-    leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
+    # Sort leaderboard by the highest score
+    leaderboard_sorted = sorted(
+        LEADERBOARD.items(),
+        key=lambda x: max(x[1]) if x[1] else 0,  # Handle empty score lists gracefully
+        reverse=True
+    )[:10]
 
     # Enumerate leaderboard for ranks in Python
     leaderboard_with_rank = [(rank + 1, user, max(scores)) for rank, (user, scores) in enumerate(leaderboard_sorted)]
@@ -178,21 +183,37 @@ def result():
     session.pop('questions', None)
 
     # Render template with leaderboard data
-    return render_template('result.html', 
-                           score=score, 
-                           leaderboard=leaderboard_sorted, 
-                           areas_for_improvement=areas_for_improvement, 
-                           time_taken=time_taken, 
-                           questions=questions)
+    return render_template(
+        'result.html', 
+        score=score, 
+        leaderboard=leaderboard_with_rank, 
+        areas_for_improvement=areas_for_improvement, 
+        time_taken=time_taken, 
+        questions=questions
+    )
 
 @app.route('/leaderboard')
 def leaderboard():
-    leaderboard_sorted = sorted(LEADERBOARD.items(), key=lambda x: max(x[1]), reverse=True)[:10]
+    # Sort leaderboard and ensure max scores are correctly computed
+    leaderboard_sorted = sorted(
+        LEADERBOARD.items(),
+        key=lambda x: max(x[1]) if x[1] else 0,  # Handle cases with no scores
+        reverse=True
+    )[:10]
+
     username = session.get('username')
     user_score = max(LEADERBOARD.get(username, [0])) if username else 0
-    user_rank = next((rank for rank, (user, _) in enumerate(leaderboard_sorted, 1) if user == username), None)
+    user_rank = next(
+        (rank for rank, (user, _) in enumerate(leaderboard_sorted, 1) if user == username),
+        None
+    )
 
-    return render_template('leaderboard.html', leaderboard=leaderboard_sorted, user_rank=user_rank, user_score=user_score)
+    return render_template(
+        'leaderboard.html', 
+        leaderboard=leaderboard_sorted, 
+        user_rank=user_rank, 
+        user_score=user_score
+    )
 
     print(f"Leaderboard data: {leaderboard_sorted}")
 
