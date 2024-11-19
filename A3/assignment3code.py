@@ -1,3 +1,4 @@
+# It is essential that all necessary libraries are present in order for the program to run.
 import random
 import time
 from flask import Flask, render_template, request, redirect, url_for, session, flash
