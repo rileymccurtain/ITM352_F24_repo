@@ -7,10 +7,10 @@ import os
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your_default_secret_key')  # Set secret key from env variable
 
-# In-memory store for users (for simplicity, only storing names)
+# In-memory store for users
 USERS = {}
 
-# Global leaderboard dictionary (In-memory, no external file storage)
+# Global leaderboard dictionary
 LEADERBOARD = {}
 
 # Load questions from JSON file
@@ -54,7 +54,7 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         print(f"USERS={USERS}")
-        # Store the name in USERS (no password needed)
+        # Store the name in USERS
         if username in USERS:
             flash("Name already exists. Please choose a different one.", "danger")
             return redirect(url_for('register'))
