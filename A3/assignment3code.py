@@ -147,6 +147,9 @@ def result():
     start_time = session.pop('start_time', time.time())
     time_taken = time.time() - start_time
 
+    # Round time_taken to the nearest second
+    time_taken = round(time_taken)
+
     # Get the 'questions' from session; ensure it exists
     questions = session.get('questions', [])
 
@@ -191,7 +194,7 @@ def result():
         score=score, 
         leaderboard=leaderboard_with_rank, 
         areas_for_improvement=areas_for_improvement, 
-        time_taken=time_taken, 
+        time_taken=time_taken,  # Time in seconds, without decimal points
         questions=questions
     )
 

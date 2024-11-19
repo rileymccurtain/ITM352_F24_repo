@@ -21,13 +21,13 @@
         h3 {
             color: #16a085;
         }
-        ul {
+        .areas-for-improvement {
             background-color: #fff;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        ul li {
+        .areas-for-improvement div {
             margin: 5px 0;
         }
         table {
@@ -65,11 +65,11 @@
 
     {% if areas_for_improvement %}
         <h3>Areas for Improvement:</h3>
-        <ul>
+        <div class="areas-for-improvement">
             {% for question in areas_for_improvement %}
-                <li>{{ question }}</li>
+                <div>{{ loop.index }}. {{ question }}</div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
         <p style="color: #27ae60; font-weight: bold;">Great job! You answered all questions correctly!</p>
     {% endif %}
