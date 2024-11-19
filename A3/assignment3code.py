@@ -24,7 +24,7 @@ def load_questions(file_path):
         return []
 
 # Initialize question list
-question_list = load_questions("japanquizquestions.json")
+question_list = load_questions("A3/japanquizquestions.json")
 
 @app.route("/")
 def home():
