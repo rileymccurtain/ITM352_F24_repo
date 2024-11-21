@@ -194,7 +194,7 @@ def result():
         score=score, 
         leaderboard=leaderboard_with_rank, 
         areas_for_improvement=areas_for_improvement, 
-        time_taken=time_taken,  # Time in seconds, without decimal points
+        time_taken=time_taken, # Time in seconds, without decimal points
         questions=questions
     )
 
