@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-trips_df = pd.read_json("../Trips from area 8.json")
+trips_df = pd.read_json("Lab14/Trips from area 8.json")
 
 # Grab the tips and payment type columns from the data frame; drop rows with empty values
 trips_df = trips_df.dropna()

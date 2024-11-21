@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from mpl_toolkits.mplot3d import Axes3D
 
-trips_df = pd.read_json("../Trips from area 8.json")
+trips_df = pd.read_json("Lab14/Trips from area 8.json")
 
 trips_gt_1 = trips_df[['trip_miles', 'fare', 'dropoff_community_area']].query('trip_miles > 1')
 

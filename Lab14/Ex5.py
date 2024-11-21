@@ -7,7 +7,7 @@ import pandas as pd
 #plt.style.use("fivethirtyeight")
 plt.style.use("dark_background")
 
-trips_df = pd.read_json("../Trips from area 8.json")
+trips_df = pd.read_json("Lab14/Trips from area 8.json")
 trip_miles_gt_0 = trips_df[['trip_miles', 'fare']].query('trip_miles > 2')
 
 fare_series = trip_miles_gt_0.fare 

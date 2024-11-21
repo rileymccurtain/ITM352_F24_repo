@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-trips_df = pd.read_json("../Trips_Fri07072017T4 trip_miles gt1.json")
+trips_df = pd.read_json("Lab14/Trips_Fri07072017T4 trip_miles gt1.json")
 
 fares_series = trips_df.fare 
 tips_series = trips_df.tips 

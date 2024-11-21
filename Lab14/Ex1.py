@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Read the data file and create a DataFrame
-trips_df = pd.read_json("../Trips from area 8.json")
+trips_df = pd.read_json("Lab14/Trips from area 8.json")
 trip_miles_series = trips_df.trip_miles
 
 fig = plt.figure() # Not strictly necessary, since plt.hist below will create a figure object
