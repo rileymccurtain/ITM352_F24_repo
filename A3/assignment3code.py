@@ -15,7 +15,7 @@ USERS = {}
 # Global leaderboard dictionary
 LEADERBOARD = {}
 
-# Load questions from JSON file
+# Obtain questions from the JSON file
 def load_questions(file_path):
     try:
         with open(file_path) as question_file:
@@ -100,7 +100,7 @@ def quiz():
 
     feedback = None # Initialize feedback variable
 
-    # Check if the user has answered the current question
+    # Verify that the user has answered the current question
     if request.method == 'POST':
         selected_answer = request.form.get('answer')
         current_question = session['questions'][session['question_num']]
@@ -112,7 +112,7 @@ def quiz():
             session['score'] += 1
             feedback = f"Correct!" # Positive feedback
         else:
-            feedback = f"Incorrect!" # Corrective feedback
+            feedback = f"Incorrect!" # Constructive feedback
 
         session['question_num'] += 1
 
@@ -120,7 +120,7 @@ def quiz():
         if session['question_num'] >= len(session['questions']):
             return redirect(url_for('result'))
 
-        # After submitting, render the next question
+        # After submitting, display the following question
         current_question = session['questions'][session['question_num']]
         random_options = random.sample(current_question[1]['options'], len(current_question[1]['options']))
 
@@ -143,7 +143,7 @@ def result():
     score = session.pop('score', 0)
     username = session.get('username')
 
-    # Calculate the time taken
+    # Determine the timeframe of the process
     start_time = session.pop('start_time', time.time())
     time_taken = time.time() - start_time
 
@@ -178,7 +178,7 @@ def result():
     # Sort leaderboard by the highest score
     leaderboard_sorted = sorted(
         LEADERBOARD.items(),
-        key=lambda x: max(x[1]) if x[1] else 0, # Handle empty score lists gracefully
+        key=lambda x: max(x[1]) if x[1] else 0, # Manage void score lists eloquently
         reverse=True
     )[:10]
 
@@ -200,7 +200,7 @@ def result():
 
 @app.route('/leaderboard')
 def leaderboard():
-    # Sort leaderboard and ensure max scores are correctly computed
+    # Make sure the maximum scores are calculated correctly. Sort the leaderboard accordingly.
     leaderboard_sorted = sorted(
         LEADERBOARD.items(),
         key=lambda x: max(x[1]) if x[1] else 0, # Handle cases with no scores
