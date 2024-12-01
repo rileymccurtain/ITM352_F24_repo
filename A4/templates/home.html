@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Flashcards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9; /* Light background color */
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff; /* White background for the container */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5e81ac; /* Soft blue for the header */
+        }
+
+        .deck-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .deck-list li {
+            background-color: #e2e8f0; /* Light blue background for each deck item */
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .deck-list li a {
+            color: #2b6cb0; /* Blue color for the links */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            gap: 12px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        label {
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #5e81ac; /* Blue border on focus */
+        }
+
+        button[type="submit"] {
+            padding: 10px;
+            background-color: #4CAF50; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        .flash-message {
+            color: #ff6347; /* Red color for flash messages */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Your Flashcards</h1>
+
+        {% if decks %}
+        <h2>Your Decks</h2>
+        <ul class="deck-list">
+            {% for deck in decks %}
+                <li>
+                    <a href="{{ url_for('deck', deck_id=deck.id) }}">{{ deck.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No decks created yet. Start by creating your first deck!</p>
+        {% endif %}
+
+        <h2>Create a New Deck</h2>
+        <form action="{{ url_for('create_deck') }}" method="POST">
+            <label for="deck_name">Deck Name:</label>
+            <input type="text" name="deck_name" required>
+            <button type="submit">Create Deck</button>
+        </form>
+    </div>
+</body>
+</html>

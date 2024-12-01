@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ deck.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* AliceBlue */
+            color: #333333; /* Dark Gray */
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4682b4; /* SteelBlue */
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        h1, h2 {
+            margin: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffffff; /* White */
+            border: 1px solid #cccccc; /* Light Gray */
+            border-radius: 5px;
+        }
+        li span.rating {
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+            color: white;
+        }
+        .easy { background-color: #32cd32; /* LimeGreen */ }
+        .medium { background-color: #ffa500; /* Orange */ }
+        .hard { background-color: #ff4500; /* Red */ }
+        form {
+            margin: 20px;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            width: calc(100% - 24px);
+            margin-bottom: 10px;
+            border: 1px solid #cccccc; /* Light Gray */
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4682b4; /* SteelBlue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5a9bd4; /* Lighter SteelBlue */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ deck.name }}</h1>
+    </header>
+    <h2>Cards</h2>
+    <ul>
+        {% for card in cards %}
+        <li>
+            Q: {{ card.question }} | A: {{ card.answer }} 
+            <span class="rating {{ card.rating }}">{{ card.rating.capitalize() }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <form method="POST">
+        <input type="text" name="question" placeholder="Question" required>
+        <input type="text" name="answer" placeholder="Answer" required>
+        <select name="rating" required>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button type="submit">Add Card</button>
+    </form>
+</body>
+</html>
