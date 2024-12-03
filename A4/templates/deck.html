@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ deck.name }}</title>
+    <title>{{ deck.name }} - Flashcards</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,16 +13,35 @@
             padding: 0;
         }
 
-        header {
-            background-color: #4682b4; /* SteelBlue */
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff; /* White background for the container */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         h1, h2 {
-            margin: 20px;
             color: #4682b4; /* SteelBlue */
+            margin: 20px;
+        }
+
+        /* Style for the back button */
+        .back-button {
+            padding: 10px 20px;
+            background-color: #4682b4; /* SteelBlue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #5a9bd4; /* Lighter SteelBlue */
         }
 
         ul {
@@ -94,30 +113,35 @@
     </style>
 </head>
 <body>
-    <header>
+    <div class="container">
+        <!-- Back to Home Button -->
+        <a href="{{ url_for('home') }}" class="back-button">Back to Home</a>
+
         <h1>{{ deck.name }}</h1>
-    </header>
-    <h2>Cards</h2>
-    <ul>
-        {% for card in cards %}
-        <li>
-            Q: {{ card.question }} | A: {{ card.answer }} 
-            <span class="rating {{ card.rating }}">{{ card.rating.capitalize() }}</span>
-            <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </li>
-        {% endfor %}
-    </ul>
-    <form method="POST">
-        <input type="text" name="question" placeholder="Question" required>
-        <input type="text" name="answer" placeholder="Answer" required>
-        <select name="rating" required>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <button type="submit">Add Card</button>
-    </form>
+
+        <h2>Cards</h2>
+        <ul>
+            {% for card in cards %}
+            <li>
+                Q: {{ card.question }} | A: {{ card.answer }} 
+                <span class="rating {{ card.rating }}">{{ card.rating.capitalize() }}</span>
+                <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <form method="POST">
+            <input type="text" name="question" placeholder="Question" required>
+            <input type="text" name="answer" placeholder="Answer" required>
+            <select name="rating" required>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button type="submit">Add Card</button>
+        </form>
+    </div>
 </body>
 </html>
