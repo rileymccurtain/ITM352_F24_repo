@@ -49,6 +49,19 @@ def create_deck():
         flash('Deck created successfully!', 'success')
         return redirect(url_for('home'))
 
+# Route to delete a deck
+@app.route('/delete_deck/<int:deck_id>', methods=['POST'])
+def delete_deck(deck_id):
+    deck = Deck.query.get_or_404(deck_id)
+    if deck.user_id != session['user_id']:
+        flash('You do not have permission to delete this deck.', 'danger')
+        return redirect(url_for('home'))
+
+    db.session.delete(deck)
+    db.session.commit()
+    flash(f'Deck "{deck.name}" deleted successfully!', 'success')
+    return redirect(url_for('home'))
+
 @app.route('/deck/<int:deck_id>', methods=['GET', 'POST'])
 def deck(deck_id):
     if 'user_id' not in session:
@@ -70,6 +83,19 @@ def deck(deck_id):
     
     cards = Card.query.filter_by(deck_id=deck.id).all()
     return render_template('deck.html', deck=deck, cards=cards)
+
+# Route to delete a card (question) from a deck
+@app.route('/deck/<int:deck_id>/delete_card/<int:card_id>', methods=['POST'])
+def delete_card(deck_id, card_id):
+    card = Card.query.get_or_404(card_id)
+    if card.deck_id != deck_id:
+        flash('Card not found in this deck.', 'danger')
+        return redirect(url_for('deck', deck_id=deck_id))
+
+    db.session.delete(card)
+    db.session.commit()
+    flash(f'Card "{card.question}" deleted successfully!', 'success')
+    return redirect(url_for('deck', deck_id=deck_id))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
