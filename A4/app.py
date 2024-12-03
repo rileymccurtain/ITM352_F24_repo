@@ -40,7 +40,6 @@ def create_deck():
         flash('Please log in first.', 'warning')
         return redirect(url_for('login'))
     
-    # Ensure the method is POST
     if request.method == 'POST':
         deck_name = request.form['deck_name']
         new_deck = Deck(name=deck_name, user_id=session['user_id'])
@@ -49,7 +48,6 @@ def create_deck():
         flash('Deck created successfully!', 'success')
         return redirect(url_for('home'))
 
-# Route to delete a deck
 @app.route('/delete_deck/<int:deck_id>', methods=['POST'])
 def delete_deck(deck_id):
     deck = Deck.query.get_or_404(deck_id)
@@ -84,7 +82,6 @@ def deck(deck_id):
     cards = Card.query.filter_by(deck_id=deck.id).all()
     return render_template('deck.html', deck=deck, cards=cards)
 
-# Route to delete a card (question) from a deck
 @app.route('/deck/<int:deck_id>/delete_card/<int:card_id>', methods=['POST'])
 def delete_card(deck_id, card_id):
     card = Card.query.get_or_404(card_id)
@@ -96,6 +93,30 @@ def delete_card(deck_id, card_id):
     db.session.commit()
     flash(f'Card "{card.question}" deleted successfully!', 'success')
     return redirect(url_for('deck', deck_id=deck_id))
+
+@app.route('/deck/<int:deck_id>/edit_card/<int:card_id>', methods=['GET', 'POST'])
+def edit_card(deck_id, card_id):
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    deck = Deck.query.get_or_404(deck_id)
+    card = Card.query.get_or_404(card_id)
+
+    if deck.user_id != session['user_id']:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        card.question = request.form['question']
+        card.answer = request.form['answer']
+        card.rating = request.form['rating']
+        
+        db.session.commit()
+        flash('Card updated successfully!', 'success')
+        return redirect(url_for('deck', deck_id=deck.id))
+
+    return render_template('edit_card.html', deck=deck, card=card)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
