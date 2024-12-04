@@ -109,10 +109,11 @@
     <div class="container">
         <h1>Practice: {{ deck.name }}</h1>
 
-        {% if card %}
+        <!-- Show the current question if available -->
+        {% if current_card %}
             <div class="card">
                 <h3 class="card-title">Question:</h3>
-                <p>{{ card.question }}</p>
+                <p>{{ current_card.question }}</p>
 
                 <form method="POST">
                     <div class="mb-3">
@@ -123,30 +124,28 @@
                 </form>
             </div>
         {% else %}
-            <div class="alert alert-info">
-                <strong>No more cards left in this deck!</strong> You have completed the quiz.
-            </div>
-        {% endif %}
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        {% if next_card %}
-            <div class="alert alert-info">
-                <strong>Next Question:</strong> {{ next_card.question }}
-            </div>
-        {% else %}
+            <!-- Show completion message -->
             <div class="alert alert-success">
                 <strong>Congratulations!</strong> You have completed the quiz.
             </div>
         {% endif %}
+
+        <!-- Display flash messages for correctness -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'correct' %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% elif category == 'incorrect' %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <hr>
         <a href="{{ url_for('deck', deck_id=deck.id) }}" class="btn-back">Back to Deck</a>

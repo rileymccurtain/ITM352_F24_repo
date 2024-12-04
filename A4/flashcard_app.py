@@ -41,13 +41,12 @@ def create_deck():
         flash('Please log in first.', 'warning')
         return redirect(url_for('login'))
     
-    if request.method == 'POST':
-        deck_name = request.form['deck_name']
-        new_deck = Deck(name=deck_name, user_id=session['user_id'])
-        db.session.add(new_deck)
-        db.session.commit()
-        flash('Deck created successfully!', 'success')
-        return redirect(url_for('home'))
+    deck_name = request.form['deck_name']
+    new_deck = Deck(name=deck_name, user_id=session['user_id'])
+    db.session.add(new_deck)
+    db.session.commit()
+    flash('Deck created successfully!', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/delete_deck/<int:deck_id>', methods=['POST'])
 def delete_deck(deck_id):
@@ -142,30 +141,29 @@ def practice(deck_id):
     ).all()
 
     current_card_index = int(request.args.get('index', 0))
-    
-    # Check if current_card_index is within bounds
-    if current_card_index < len(cards):
-        current_card = cards[current_card_index]
-    else:
-        current_card = None
 
-    if request.method == 'POST' and current_card:
+    # Check if user has completed all cards
+    if current_card_index >= len(cards):
+        flash('Congratulations! You have completed the quiz.', 'success')
+        return redirect(url_for('deck', deck_id=deck.id))
+
+    current_card = cards[current_card_index]
+
+    if request.method == 'POST':
         user_answer = request.form['answer']
         correct = user_answer.strip().lower() == current_card.answer.strip().lower()
-        flash('Correct!' if correct else f'Wrong! The correct answer was: {current_card.answer}', 'info')
-
-        next_card_index = current_card_index + 1
-        if next_card_index < len(cards):
-            return redirect(url_for('practice', deck_id=deck.id, index=next_card_index))
+        
+        # Flash message based on correctness of the answer
+        if correct:
+            flash('Correct!', 'correct')
         else:
-            flash('You have completed all the cards in this deck!', 'success')
-            return redirect(url_for('deck', deck_id=deck.id))
+            flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
 
-    # If no valid card to show, notify user
-    if current_card is None:
-        flash('No more cards to practice in this deck.', 'warning')
-    
-    return render_template('practice.html', deck=deck, card=current_card, index=current_card_index)
+        # Move to the next card
+        next_card_index = current_card_index + 1
+        return redirect(url_for('practice', deck_id=deck.id, index=next_card_index))
+
+    return render_template('practice.html', deck=deck, current_card=current_card, index=current_card_index)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
