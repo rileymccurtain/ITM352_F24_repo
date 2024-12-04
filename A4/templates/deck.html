@@ -136,6 +136,11 @@
             {% endfor %}
         </ul>
 
+        <!-- Button to Start Quiz -->
+        <form method="get" action="{{ url_for('practice', deck_id=deck.id) }}">
+            <button type="submit">Start Quiz</button>
+        </form>
+
         <form method="POST">
             <input type="text" name="question" placeholder="Question" required>
             <input type="text" name="answer" placeholder="Answer" required>

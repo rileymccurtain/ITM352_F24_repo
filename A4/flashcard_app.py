@@ -1,3 +1,4 @@
+# It is essential that all necessary libraries are present in order for the program to run.
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -117,6 +118,54 @@ def edit_card(deck_id, card_id):
         return redirect(url_for('deck', deck_id=deck.id))
 
     return render_template('edit_card.html', deck=deck, card=card)
+
+# Practice Route for Flashcards
+@app.route('/deck/<int:deck_id>/practice', methods=['GET', 'POST'])
+def practice(deck_id):
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    deck = Deck.query.get_or_404(deck_id)
+    if deck.user_id != session['user_id']:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home'))
+
+    # Get cards ordered by rating: easy -> medium -> hard
+    cards = Card.query.filter_by(deck_id=deck.id).order_by(
+        db.case(
+            (Card.rating == 'easy', 1),
+            (Card.rating == 'medium', 2),
+            (Card.rating == 'hard', 3),
+            else_=4
+        )
+    ).all()
+
+    current_card_index = int(request.args.get('index', 0))
+    
+    # Check if current_card_index is within bounds
+    if current_card_index < len(cards):
+        current_card = cards[current_card_index]
+    else:
+        current_card = None
+
+    if request.method == 'POST' and current_card:
+        user_answer = request.form['answer']
+        correct = user_answer.strip().lower() == current_card.answer.strip().lower()
+        flash('Correct!' if correct else f'Wrong! The correct answer was: {current_card.answer}', 'info')
+
+        next_card_index = current_card_index + 1
+        if next_card_index < len(cards):
+            return redirect(url_for('practice', deck_id=deck.id, index=next_card_index))
+        else:
+            flash('You have completed all the cards in this deck!', 'success')
+            return redirect(url_for('deck', deck_id=deck.id))
+
+    # If no valid card to show, notify user
+    if current_card is None:
+        flash('No more cards to practice in this deck.', 'warning')
+    
+    return render_template('practice.html', deck=deck, card=current_card, index=current_card_index)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
