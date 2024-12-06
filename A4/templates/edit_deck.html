@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Deck</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* AliceBlue */
+            color: #333333; /* Dark Gray */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff; /* White background for the container */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4682b4; /* SteelBlue */
+        }
+
+        h2 {
+            color: #4682b4;
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4682b4; /* Blue border on focus */
+        }
+
+        button[type="submit"] {
+            padding: 10px;
+            background-color: #4682b4; /* SteelBlue button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #5a9bd4; /* Lighter SteelBlue on hover */
+        }
+
+        .flash-message {
+            color: #ff6347; /* Red color for flash messages */
+            font-weight: bold;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #f0f8ff;
+            color: #4682b4;
+            text-decoration: none;
+            border-radius: 4px;
+            border: 1px solid #4682b4;
+        }
+
+        .back-button:hover {
+            background-color: #e0efff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Deck: {{ deck.name }}</h1>
+
+        <!-- Flash Message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Edit Deck Form -->
+        <form action="{{ url_for('edit_deck', deck_id=deck.id) }}" method="POST">
+            <label for="deck_name">Deck Name:</label>
+            <input type="text" name="deck_name" value="{{ deck.name }}" required>
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <!-- Back Button -->
+        <a href="{{ url_for('home') }}" class="back-button">Back to Decks</a>
+    </div>
+</body>
+</html>

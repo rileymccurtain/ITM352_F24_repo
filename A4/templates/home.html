@@ -38,6 +38,9 @@
             padding: 12px;
             border-radius: 5px;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .deck-list li a {
@@ -57,6 +60,20 @@
 
         .deck-list li form button:hover {
             background-color: #ff6347; /* Lighter red on hover */
+        }
+
+        .deck-list li .edit-button {
+            background-color: #4682b4; /* SteelBlue for Edit button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            text-decoration: none;
+        }
+
+        .deck-list li .edit-button:hover {
+            background-color: #5a9bd4; /* Lighter SteelBlue on hover */
         }
 
         form {
@@ -115,10 +132,15 @@
         <ul class="deck-list">
             {% for deck in decks %}
                 <li>
-                    <a href="{{ url_for('deck', deck_id=deck.id) }}">{{ deck.name }}</a>
-                    <form action="{{ url_for('delete_deck', deck_id=deck.id) }}" method="POST" style="display:inline;">
-                        <button type="submit">Delete</button>
-                    </form>
+                    <div>
+                        <a href="{{ url_for('deck', deck_id=deck.id) }}">{{ deck.name }}</a>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('edit_deck', deck_id=deck.id) }}" class="edit-button">Edit</a>
+                        <form action="{{ url_for('delete_deck', deck_id=deck.id) }}" method="POST" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
                 </li>
             {% endfor %}
         </ul>

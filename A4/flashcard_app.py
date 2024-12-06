@@ -118,6 +118,26 @@ def edit_card(deck_id, card_id):
 
     return render_template('edit_card.html', deck=deck, card=card)
 
+@app.route('/deck/<int:deck_id>/edit', methods=['GET', 'POST'])
+def edit_deck(deck_id):
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    deck = Deck.query.get_or_404(deck_id)
+
+    if deck.user_id != session['user_id']:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        deck.name = request.form['deck_name']
+        db.session.commit()
+        flash('Deck updated successfully!', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('edit_deck.html', deck=deck)
+
 # Practice Route for Flashcards
 @app.route('/deck/<int:deck_id>/practice', methods=['GET', 'POST'])
 def practice(deck_id):

@@ -24,10 +24,9 @@
 
         h1, h2 {
             color: #4682b4; /* SteelBlue */
-            margin: 20px;
+            margin: 20px 0;
         }
 
-        /* Style for the back button */
         .back-button {
             padding: 10px 20px;
             background-color: #4682b4; /* SteelBlue */
@@ -45,7 +44,7 @@
         }
 
         form {
-            margin: 20px;
+            margin: 20px 0;
         }
 
         input[type="text"], select {
@@ -68,6 +67,20 @@
         button:hover {
             background-color: #5a9bd4; /* Lighter SteelBlue */
         }
+
+        .delete-button {
+            padding: 10px 20px;
+            background-color: #ff6347; /* Red color for delete */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .delete-button:hover {
+            background-color: #ff4500; /* Darker Red on hover */
+        }
     </style>
 </head>
 <body>
@@ -78,6 +91,16 @@
         <h1>Edit Card</h1>
         <h2>{{ deck.name }}</h2>
 
+        <!-- Flash Message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message" style="color: #ff6347; font-weight: bold;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Edit Card Form -->
         <form method="POST">
             <input type="text" name="question" value="{{ card.question }}" placeholder="Question" required>
             <input type="text" name="answer" value="{{ card.answer }}" placeholder="Answer" required>
@@ -87,6 +110,11 @@
                 <option value="hard" {% if card.rating == 'hard' %}selected{% endif %}>Hard</option>
             </select>
             <button type="submit">Save Changes</button>
+        </form>
+
+        <!-- Delete Card Form -->
+        <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST">
+            <button type="submit" class="delete-button">Delete Card</button>
         </form>
     </div>
 </body>
