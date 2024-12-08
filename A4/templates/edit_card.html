@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Card - {{ deck.name }}</title>
+    <title>Edit Card - Flashcards</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f8ff; /* AliceBlue */
-            color: #333333; /* Dark Gray */
+            color: #333;
             margin: 0;
             padding: 0;
         }
@@ -17,104 +17,101 @@
             width: 80%;
             margin: 0 auto;
             padding: 20px;
-            background-color: #ffffff; /* White background for the container */
+            background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        h1, h2 {
-            color: #4682b4; /* SteelBlue */
-            margin: 20px 0;
-        }
-
-        .back-button {
-            padding: 10px 20px;
-            background-color: #4682b4; /* SteelBlue */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .back-button:hover {
-            background-color: #5a9bd4; /* Lighter SteelBlue */
+        h1 {
+            text-align: center;
+            color: #4682b4;
         }
 
         form {
-            margin: 20px 0;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        input[type="text"], select {
-            padding: 10px;
-            width: calc(100% - 24px);
-            margin-bottom: 10px;
-            border: 1px solid #cccccc; /* Light Gray */
-            border-radius: 5px;
+        label {
+            font-size: 16px;
         }
 
-        button {
-            padding: 10px 20px;
-            background-color: #4682b4; /* SteelBlue */
+        input[type="text"] {
+            padding: 8px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4682b4;
+        }
+
+        select {
+            padding: 8px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-button,
+        .delete-button {
+            padding: 10px 15px;
+            font-size: 14px;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #5a9bd4; /* Lighter SteelBlue */
+        .edit-button {
+            background-color: #4682b4; /* SteelBlue */
+        }
+
+        .edit-button:hover {
+            background-color: #5a9bd4;
         }
 
         .delete-button {
-            padding: 10px 20px;
-            background-color: #ff6347; /* Red color for delete */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
+            background-color: #ff4500; /* Red */
         }
 
         .delete-button:hover {
-            background-color: #ff4500; /* Darker Red on hover */
+            background-color: #ff6347;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Back to Deck Button -->
-        <a href="{{ url_for('deck', deck_id=deck.id) }}" class="back-button">Back to Deck</a>
-
         <h1>Edit Card</h1>
-        <h2>{{ deck.name }}</h2>
+        <form action="{{ url_for('edit_card', deck_id=deck.id, card_id=card.id) }}" method="POST">
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question" value="{{ card.question }}" required>
 
-        <!-- Flash Message -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-message" style="color: #ff6347; font-weight: bold;">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+            <label for="answer">Answer:</label>
+            <input type="text" id="answer" name="answer" value="{{ card.answer }}" required>
 
-        <!-- Edit Card Form -->
-        <form method="POST">
-            <input type="text" name="question" value="{{ card.question }}" placeholder="Question" required>
-            <input type="text" name="answer" value="{{ card.answer }}" placeholder="Answer" required>
-            <select name="rating" required>
+            <label for="rating">Rating:</label>
+            <select id="rating" name="rating" required>
                 <option value="easy" {% if card.rating == 'easy' %}selected{% endif %}>Easy</option>
                 <option value="medium" {% if card.rating == 'medium' %}selected{% endif %}>Medium</option>
                 <option value="hard" {% if card.rating == 'hard' %}selected{% endif %}>Hard</option>
             </select>
-            <button type="submit">Save Changes</button>
-        </form>
 
-        <!-- Delete Card Form -->
-        <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST">
-            <button type="submit" class="delete-button">Delete Card</button>
+            <div class="buttons">
+                <button type="submit" class="edit-button">Save Changes</button>
+                <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-button">Delete Card</button>
+                </form>
+            </div>
         </form>
     </div>
 </body>

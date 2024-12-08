@@ -93,8 +93,33 @@
             background-color: #5a9bd4; /* Lighter SteelBlue */
         }
 
-        li form button {
-            background-color: #ff4500; /* Red for delete button */
+        li form {
+            display: inline;
+            margin-left: 10px;
+        }
+
+        li form.button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .edit-button {
+            background-color: #4682b4; /* SteelBlue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-weight: bold; /* Make the edit button bold */
+        }
+
+        .edit-button:hover {
+            background-color: #5a9bd4; /* Lighter SteelBlue */
+        }
+
+        .delete-button {
+            background-color: #ff4500; /* Red */
             color: white;
             border: none;
             border-radius: 5px;
@@ -102,7 +127,7 @@
             padding: 5px 10px;
         }
 
-        li form button:hover {
+        .delete-button:hover {
             background-color: #ff6347; /* Lighter red on hover */
         }
 
@@ -125,13 +150,16 @@
             <li>
                 Q: {{ card.question }} | A: {{ card.answer }} 
                 <span class="rating {{ card.rating }}">{{ card.rating.capitalize() }}</span>
-                <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST" style="display:inline;">
-                    <button type="submit">Delete</button>
-                </form>
-                <!-- Edit Button -->
-                <a href="{{ url_for('edit_card', deck_id=deck.id, card_id=card.id) }}">
-                    <button>Edit</button>
-                </a>
+                <div class="button-group">
+                    <!-- Edit Button -->
+                    <form action="{{ url_for('edit_card', deck_id=deck.id, card_id=card.id) }}" method="GET" style="display:inline;">
+                        <button type="submit" class="edit-button">Edit</button>
+                    </form>
+                    <!-- Delete Button -->
+                    <form action="{{ url_for('delete_card', deck_id=deck.id, card_id=card.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </div>
             </li>
             {% endfor %}
         </ul>
