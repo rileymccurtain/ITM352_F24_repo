@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+import time
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -40,7 +41,7 @@ def create_deck():
     if 'user_id' not in session:
         flash('Please log in first.', 'warning')
         return redirect(url_for('login'))
-    
+
     deck_name = request.form['deck_name']
     new_deck = Deck(name=deck_name, user_id=session['user_id'])
     db.session.add(new_deck)
@@ -69,7 +70,7 @@ def deck(deck_id):
     if deck.user_id != session['user_id']:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
-    
+
     if request.method == 'POST':
         question = request.form['question']
         answer = request.form['answer']
@@ -78,7 +79,7 @@ def deck(deck_id):
         db.session.add(new_card)
         db.session.commit()
         flash('Card added successfully!', 'success')
-    
+
     cards = Card.query.filter_by(deck_id=deck.id).all()
     return render_template('deck.html', deck=deck, cards=cards)
 
@@ -111,7 +112,7 @@ def edit_card(deck_id, card_id):
         card.question = request.form['question']
         card.answer = request.form['answer']
         card.rating = request.form['rating']
-        
+
         db.session.commit()
         flash('Card updated successfully!', 'success')
         return redirect(url_for('deck', deck_id=deck.id))
@@ -138,7 +139,6 @@ def edit_deck(deck_id):
 
     return render_template('edit_deck.html', deck=deck)
 
-# Practice Route for Flashcards
 @app.route('/deck/<int:deck_id>/practice', methods=['GET', 'POST'])
 def practice(deck_id):
     if 'user_id' not in session:
@@ -150,55 +150,75 @@ def practice(deck_id):
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
-    # Get all cards for the deck
     cards = Card.query.filter_by(deck_id=deck.id).all()
-
-    # Sort cards by difficulty
     cards_sorted = sorted(cards, key=lambda card: ('easy', 'medium', 'hard').index(card.rating))
 
     current_card_index = int(request.args.get('index', 0))
-    shown_cards = set()  # To track which cards have been displayed
+    incorrect_answers = session.get('quiz_incorrect', 0)
+    start_time = session.get('quiz_start_time', None)
 
-    # Check if user has completed all cards
+    if start_time is None:
+        session['quiz_start_time'] = time.time()
+
     if current_card_index >= len(cards_sorted):
-        flash('Congratulations! You have completed the quiz.', 'success')
-        return redirect(url_for('deck', deck_id=deck.id))
-
-    # Get current card
-    while cards_sorted[current_card_index].id in shown_cards:
-        current_card_index += 1
-        if current_card_index >= len(cards_sorted):
-            flash('Congratulations! You have completed the quiz.', 'success')
-            return redirect(url_for('deck', deck_id=deck.id))
+        return redirect(url_for('result', deck_id=deck.id))
 
     current_card = cards_sorted[current_card_index]
-    shown_cards.add(current_card.id)  # Mark this card as shown
 
     if request.method == 'POST':
         user_answer = request.form['answer']
         correct = user_answer.strip().lower() == current_card.answer.strip().lower()
-        
-        # Flash message based on correctness of the answer
-        if correct:
-            flash('Correct!', 'correct')
-        else:
-            flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
 
-        # Move to the next unique card
+        if not correct:
+            incorrect_answers += 1
+            session['quiz_incorrect'] = incorrect_answers  # Update session variable
+            flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
+        else:
+            flash('Correct!', 'correct')
+
         current_card_index += 1
-        
-        # Ensure next card is unique
-        while current_card_index < len(cards_sorted) and cards_sorted[current_card_index].id in shown_cards:
-            current_card_index += 1
-        
-        # Check if we have completed all cards
-        if current_card_index >= len(cards_sorted):
-            flash('Congratulations! You have completed the quiz.', 'success')
-            return redirect(url_for('deck', deck_id=deck.id))
-        
         return redirect(url_for('practice', deck_id=deck.id, index=current_card_index))
 
     return render_template('practice.html', deck=deck, current_card=current_card, index=current_card_index)
+
+@app.route('/deck/<int:deck_id>/result')
+def result(deck_id):
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    deck = Deck.query.get_or_404(deck_id)
+    if deck.user_id != session['user_id']:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home'))
+
+    cards = Card.query.filter_by(deck_id=deck.id).all()
+    total_cards = len(cards)
+
+    incorrect_answers = session.pop('quiz_incorrect', 0)  # Default to 0 if not set
+    correct_answers = total_cards - incorrect_answers
+
+    end_time = time.time()
+    start_time = session.pop('quiz_start_time', None)
+    time_spent = int(end_time - start_time) if start_time else 0
+
+    accuracy = (correct_answers / total_cards * 100) if total_cards > 0 else 0
+    time_minutes, time_seconds = divmod(time_spent, 60)
+
+    ratings_count = {'easy': 0, 'medium': 0, 'hard': 0}
+    for card in cards:
+        ratings_count[card.rating] += 1
+
+    return render_template(
+        'result.html',
+        deck=deck,
+        total_cards=total_cards,
+        correct_answers=correct_answers,
+        incorrect_answers=incorrect_answers,
+        accuracy=round(accuracy, 2),
+        time_spent=f"{time_minutes}:{time_seconds:02}",
+        ratings_count=ratings_count
+    )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -222,18 +242,18 @@ def register():
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'danger')
         else:
-            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            hashed_password = generate_password_hash(password)
             new_user = User(username=username, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
+            flash('Account created successfully!', 'success')
             return redirect(url_for('login'))
     return render_template('register.html')
 
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
-    flash('You have been logged out.', 'info')
+    session.clear()
+    flash('Logged out successfully.', 'info')
     return redirect(url_for('login'))
 
 if __name__ == '__main__':

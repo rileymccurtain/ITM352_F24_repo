@@ -103,6 +103,12 @@
         .btn-back:hover {
             background-color: #5a6268;
         }
+
+        .completion-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -125,7 +131,7 @@
             </div>
         {% else %}
             <!-- Show completion message -->
-            <div class="alert alert-success">
+            <div class="completion-message">
                 <strong>Congratulations!</strong> You have completed the quiz.
             </div>
         {% endif %}
