@@ -150,24 +150,29 @@ def practice(deck_id):
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
-    # Get cards ordered by rating: easy -> medium -> hard
-    cards = Card.query.filter_by(deck_id=deck.id).order_by(
-        db.case(
-            (Card.rating == 'easy', 1),
-            (Card.rating == 'medium', 2),
-            (Card.rating == 'hard', 3),
-            else_=4
-        )
-    ).all()
+    # Get all cards for the deck
+    cards = Card.query.filter_by(deck_id=deck.id).all()
+
+    # Sort cards by difficulty
+    cards_sorted = sorted(cards, key=lambda card: ('easy', 'medium', 'hard').index(card.rating))
 
     current_card_index = int(request.args.get('index', 0))
+    shown_cards = set()  # To track which cards have been displayed
 
     # Check if user has completed all cards
-    if current_card_index >= len(cards):
+    if current_card_index >= len(cards_sorted):
         flash('Congratulations! You have completed the quiz.', 'success')
         return redirect(url_for('deck', deck_id=deck.id))
 
-    current_card = cards[current_card_index]
+    # Get current card
+    while cards_sorted[current_card_index].id in shown_cards:
+        current_card_index += 1
+        if current_card_index >= len(cards_sorted):
+            flash('Congratulations! You have completed the quiz.', 'success')
+            return redirect(url_for('deck', deck_id=deck.id))
+
+    current_card = cards_sorted[current_card_index]
+    shown_cards.add(current_card.id)  # Mark this card as shown
 
     if request.method == 'POST':
         user_answer = request.form['answer']
@@ -179,9 +184,19 @@ def practice(deck_id):
         else:
             flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
 
-        # Move to the next card
-        next_card_index = current_card_index + 1
-        return redirect(url_for('practice', deck_id=deck.id, index=next_card_index))
+        # Move to the next unique card
+        current_card_index += 1
+        
+        # Ensure next card is unique
+        while current_card_index < len(cards_sorted) and cards_sorted[current_card_index].id in shown_cards:
+            current_card_index += 1
+        
+        # Check if we have completed all cards
+        if current_card_index >= len(cards_sorted):
+            flash('Congratulations! You have completed the quiz.', 'success')
+            return redirect(url_for('deck', deck_id=deck.id))
+        
+        return redirect(url_for('practice', deck_id=deck.id, index=current_card_index))
 
     return render_template('practice.html', deck=deck, current_card=current_card, index=current_card_index)
 
