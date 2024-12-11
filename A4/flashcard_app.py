@@ -150,21 +150,31 @@ def practice(deck_id):
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home'))
 
-    cards = Card.query.filter_by(deck_id=deck.id).all()
-    cards_sorted = sorted(cards, key=lambda card: ('easy', 'medium', 'hard').index(card.rating))
-
-    current_card_index = int(request.args.get('index', 0))
-    incorrect_answers = session.get('quiz_incorrect', 0)
-    incorrect_card_ids = session.get('incorrect_card_ids', [])
-
-    start_time = session.get('quiz_start_time', None)
-    if start_time is None:
+    # Clear session data for a new quiz attempt
+    if 'shuffled_cards' not in session:
+        import random
+        cards = Card.query.filter_by(deck_id=deck.id).all()
+        easy_cards = [card for card in cards if card.rating == 'easy']
+        medium_cards = [card for card in cards if card.rating == 'medium']
+        hard_cards = [card for card in cards if card.rating == 'hard']
+        random.shuffle(easy_cards)
+        random.shuffle(medium_cards)
+        random.shuffle(hard_cards)
+        session['shuffled_cards'] = [card.id for card in (easy_cards + medium_cards + hard_cards)]
+        session['current_card_index'] = 0
+        session['incorrect_card_ids'] = []
+        session['quiz_incorrect'] = 0
         session['quiz_start_time'] = time.time()
 
-    if current_card_index >= len(cards_sorted):
+    shuffled_card_ids = session['shuffled_cards']
+    current_card_index = session['current_card_index']
+    incorrect_answers = session['quiz_incorrect']
+    incorrect_card_ids = session['incorrect_card_ids']
+
+    if current_card_index >= len(shuffled_card_ids):
         return redirect(url_for('result', deck_id=deck.id))
 
-    current_card = cards_sorted[current_card_index]
+    current_card = Card.query.get_or_404(shuffled_card_ids[current_card_index])
 
     if request.method == 'POST':
         user_answer = request.form['answer']
@@ -175,13 +185,14 @@ def practice(deck_id):
             if current_card.id not in incorrect_card_ids:
                 incorrect_card_ids.append(current_card.id)
             session['quiz_incorrect'] = incorrect_answers
-            session['incorrect_card_ids'] = incorrect_card_ids  # Update session variable
+            session['incorrect_card_ids'] = incorrect_card_ids
             flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
         else:
             flash('Correct!', 'correct')
 
-        current_card_index += 1
-        return redirect(url_for('practice', deck_id=deck.id, index=current_card_index))
+        # Move to the next question
+        session['current_card_index'] += 1
+        return redirect(url_for('practice', deck_id=deck.id))
 
     return render_template('practice.html', deck=deck, current_card=current_card, index=current_card_index)
 
