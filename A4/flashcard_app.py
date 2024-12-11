@@ -151,7 +151,7 @@ def practice(deck_id):
         return redirect(url_for('home'))
 
     # Clear session data for a new quiz attempt
-    if 'shuffled_cards' not in session:
+    if 'shuffled_cards' not in session or 'quiz_completed' in session:
         import random
         cards = Card.query.filter_by(deck_id=deck.id).all()
         easy_cards = [card for card in cards if card.rating == 'easy']
@@ -163,20 +163,15 @@ def practice(deck_id):
         session['shuffled_cards'] = [card.id for card in (easy_cards + medium_cards + hard_cards)]
         session['current_card_index'] = 0
         session['incorrect_card_ids'] = []
-        session['quiz_incorrect'] = 0  # Set this at the start
+        session['quiz_incorrect'] = 0  # Reset this on start
         session['quiz_start_time'] = time.time()
-
-    # Debug statement to check if quiz_incorrect exists in session
-    print("Session Keys:", session.keys())
-    incorrect_answers = session.get('quiz_incorrect', 0)  # Default to 0 if not set
-    incorrect_card_ids = session.get('incorrect_card_ids', [])
-    print("quiz_incorrect:", incorrect_answers)  # Debug print
-    print("incorrect_card_ids:", incorrect_card_ids)  # Debug print
+        session.pop('quiz_completed', None)  # Remove the completed flag if it exists
 
     shuffled_card_ids = session['shuffled_cards']
     current_card_index = session['current_card_index']
 
     if current_card_index >= len(shuffled_card_ids):
+        session['quiz_completed'] = True  # Mark the quiz as completed
         return redirect(url_for('result', deck_id=deck.id))
 
     current_card = Card.query.get_or_404(shuffled_card_ids[current_card_index])
@@ -186,11 +181,9 @@ def practice(deck_id):
         correct = user_answer.strip().lower() == current_card.answer.strip().lower()
 
         if not correct:
-            incorrect_answers += 1
-            if current_card.id not in incorrect_card_ids:
-                incorrect_card_ids.append(current_card.id)
-            session['quiz_incorrect'] = incorrect_answers
-            session['incorrect_card_ids'] = incorrect_card_ids
+            session['quiz_incorrect'] += 1
+            if current_card.id not in session['incorrect_card_ids']:
+                session['incorrect_card_ids'].append(current_card.id)
             flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
         else:
             flash('Correct!', 'correct')
