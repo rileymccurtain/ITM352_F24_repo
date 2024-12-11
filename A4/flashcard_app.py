@@ -163,13 +163,18 @@ def practice(deck_id):
         session['shuffled_cards'] = [card.id for card in (easy_cards + medium_cards + hard_cards)]
         session['current_card_index'] = 0
         session['incorrect_card_ids'] = []
-        session['quiz_incorrect'] = 0
+        session['quiz_incorrect'] = 0  # Set this at the start
         session['quiz_start_time'] = time.time()
+
+    # Debug statement to check if quiz_incorrect exists in session
+    print("Session Keys:", session.keys())
+    incorrect_answers = session.get('quiz_incorrect', 0)  # Default to 0 if not set
+    incorrect_card_ids = session.get('incorrect_card_ids', [])
+    print("quiz_incorrect:", incorrect_answers)  # Debug print
+    print("incorrect_card_ids:", incorrect_card_ids)  # Debug print
 
     shuffled_card_ids = session['shuffled_cards']
     current_card_index = session['current_card_index']
-    incorrect_answers = session['quiz_incorrect']
-    incorrect_card_ids = session['incorrect_card_ids']
 
     if current_card_index >= len(shuffled_card_ids):
         return redirect(url_for('result', deck_id=deck.id))
