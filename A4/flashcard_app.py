@@ -155,8 +155,9 @@ def practice(deck_id):
 
     current_card_index = int(request.args.get('index', 0))
     incorrect_answers = session.get('quiz_incorrect', 0)
-    start_time = session.get('quiz_start_time', None)
+    incorrect_card_ids = session.get('incorrect_card_ids', [])
 
+    start_time = session.get('quiz_start_time', None)
     if start_time is None:
         session['quiz_start_time'] = time.time()
 
@@ -171,7 +172,10 @@ def practice(deck_id):
 
         if not correct:
             incorrect_answers += 1
-            session['quiz_incorrect'] = incorrect_answers  # Update session variable
+            if current_card.id not in incorrect_card_ids:
+                incorrect_card_ids.append(current_card.id)
+            session['quiz_incorrect'] = incorrect_answers
+            session['incorrect_card_ids'] = incorrect_card_ids  # Update session variable
             flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
         else:
             flash('Correct!', 'correct')
@@ -205,7 +209,11 @@ def result(deck_id):
     accuracy = (correct_answers / total_cards * 100) if total_cards > 0 else 0
     time_minutes, time_seconds = divmod(time_spent, 60)
 
+    # Card difficulty breakdown
     ratings_count = {'easy': 0, 'medium': 0, 'hard': 0}
+    incorrect_card_ids = session.pop('incorrect_card_ids', [])
+    improvement_cards = Card.query.filter(Card.id.in_(incorrect_card_ids)).all()
+
     for card in cards:
         ratings_count[card.rating] += 1
 
@@ -217,7 +225,8 @@ def result(deck_id):
         incorrect_answers=incorrect_answers,
         accuracy=round(accuracy, 2),
         time_spent=f"{time_minutes}:{time_seconds:02}",
-        ratings_count=ratings_count
+        ratings_count=ratings_count,
+        improvement_cards=improvement_cards
     )
 
 @app.route('/login', methods=['GET', 'POST'])

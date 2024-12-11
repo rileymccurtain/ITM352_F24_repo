@@ -29,10 +29,27 @@
             margin-bottom: 20px;
         }
 
+        h2 {
+            font-size: 2rem;
+            color: #007bff;
+            margin-top: 20px;
+        }
+
         p {
             font-size: 1.2rem;
             color: #6c757d;
             margin: 10px 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin: 5px 0;
         }
 
         a.btn {
@@ -54,9 +71,33 @@
 <body>
     <div class="container">
         <h1>Quiz Completed</h1>
-        <p>Time spent: {{ time_spent }} (min:sec)</p>
-        <p>Percentage accuracy: {{ percentage_accuracy }}%</p>
-        <p>Number of cards incorrect: {{ incorrect_cards }}</p>
+
+        <h2>Results for Deck: {{ deck.name }}</h2>
+
+        <p><strong>Total Cards:</strong> {{ total_cards }}</p>
+        <p><strong>Correct Answers:</strong> {{ correct_answers }}</p>
+        <p><strong>Incorrect Answers:</strong> {{ incorrect_answers }}</p>
+        <p><strong>Accuracy:</strong> {{ accuracy }}%</p>
+        <p><strong>Time Spent:</strong> {{ time_spent }}</p>
+
+        <h3>Card Difficulty Breakdown:</h3>
+        <ul>
+            <li>Easy: {{ ratings_count['easy'] }}</li>
+            <li>Medium: {{ ratings_count['medium'] }}</li>
+            <li>Hard: {{ ratings_count['hard'] }}</li>
+        </ul>
+
+        <h3>Improvement Opportunities:</h3>
+        {% if improvement_cards %}
+            <ul>
+            {% for card in improvement_cards %}
+                <li><strong>Question:</strong> {{ card.question }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No specific areas of improvement identified. Great job!</p>
+        {% endif %}
+
         <a href="{{ url_for('home') }}" class="btn">Return to Home</a>
     </div>
 </body>
