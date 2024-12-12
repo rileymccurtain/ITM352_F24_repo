@@ -28,7 +28,7 @@ class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(300), nullable=False)
     answer = db.Column(db.String(300), nullable=False)
-    rating = db.Column(db.String(50), nullable=False)  # easy, medium, hard
+    rating = db.Column(db.String(50), nullable=False)  # Rating (easy, medium, hard)
     deck_id = db.Column(db.Integer, db.ForeignKey('deck.id'), nullable=False)
 
 # Routes
@@ -217,8 +217,9 @@ def practice(deck_id):
         current_card=current_card,
         index=current_card_index,
         last_feedback=last_feedback
-    )
+    )  # Render practice template
 
+# Route to display quiz results for a specific deck
 @app.route('/deck/<int:deck_id>/result')
 def result(deck_id):
     if 'user_id' not in session:
@@ -276,7 +277,7 @@ def login():
             return redirect(url_for('home'))
         else:
             flash('Invalid username or password', 'danger')
-    return render_template('login.html')
+    return render_template('login.html') # Render login template
 
 # Registration route: Handles user registration
 @app.route('/register', methods=['GET', 'POST'])
@@ -293,6 +294,7 @@ def register():
             db.session.commit()  # Commit changes to the database
             flash('Account created successfully!', 'success')
             return redirect(url_for('login'))  # Redirect to login after registration
+
     return render_template('register.html')  # Render registration template
 
 # Logout route: Clears session and redirects to login page
