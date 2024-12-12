@@ -30,53 +30,61 @@
         }
 
         .card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
             position: relative;
-            transform-style: preserve-3d;
+            width: 100%;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
             transition: transform 0.5s;
-            max-width: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .card:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 300px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
 
-        .card:hover {
+        .card-front {
+            background-color: #ffffff;
+        }
+
+        .card-back {
+            background-color: #f8f9fa; /* Light Gray */
             transform: rotateY(180deg);
-        }
-
-        .card .front,
-        .card .back {
-            position: absolute;
-            width: 100%;
-            backface-visibility: hidden;
-            transition: transform 0.5s;
-        }
-
-        .card .back {
-            transform: rotateY(180deg);
-        }
-
-        .card-content {
-            padding: 10px;
-            max-width: 100%;
-            margin: auto;
         }
 
         .form-label {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            text-align: center;
         }
 
         .form-control {
             width: 100%;
             padding: 10px;
-            margin-top: 5px;
+            margin-top: 10px;
+            margin-bottom: 20px; /* Adds space below the input field */
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
@@ -139,7 +147,6 @@
         .btn-back:hover {
             background-color: #36648b; /* Darker SteelBlue */
         }
-
     </style>
 </head>
 <body>
@@ -147,49 +154,37 @@
         <a href="{{ url_for('deck', deck_id=deck.id) }}" class="btn-back">Back to Deck</a>
         <h1>Practice: {{ deck.name }}</h1>
 
+        <!-- Show feedback for the last question -->
+        {% if last_feedback %}
+            <div class="alert alert-info">
+                {{ last_feedback }}
+            </div>
+        {% endif %}
+
         <!-- Show the current card -->
         {% if current_card %}
             <div class="card">
-                <div class="front card-content">
-                    <h3 class="question-label">Question:</h3>
-                    <div class="question-content">{{ current_card.question }}</div>
-                </div>
-                <div class="back card-content">
-                    <h3 class="form-label">Your Answer:</h3>
-                    <form method="POST">
-                        <input type="hidden" name="card_id" value="{{ current_card.id }}">
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="answer" name="answer" required>
-                        </div>
-                        <button type="submit" class="btn-submit">Submit Answer</button>
-                    </form>
-
-                    <!-- Flash message feedback -->
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                {% if category == 'correct' %}
-                                    <div class="alert alert-success">
-                                        {{ message }}
-                                    </div>
-                                {% elif category == 'incorrect' %}
-                                    <div class="alert alert-danger">
-                                        {{ message }}
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+                <div class="card-inner">
+                    <div class="card-face card-front">
+                        <h3>Question:</h3>
+                        <p>{{ current_card.question }}</p>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3 class="form-label">Your Answer:</h3>
+                        <form method="POST">
+                            <input type="hidden" name="card_id" value="{{ current_card.id }}">
+                            <input type="text" id="answer" name="answer" class="form-control" required>
+                            <button type="submit" class="btn-submit">Submit Answer</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         {% else %}
             <!-- Show completion message -->
-            <div class="completion-message">
+            <div class="alert alert-success">
                 <strong>Congratulations!</strong> You have completed the quiz.
             </div>
         {% endif %}
-
-        <hr>
     </div>
 </body>
 </html>

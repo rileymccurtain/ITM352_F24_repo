@@ -166,6 +166,7 @@ def practice(deck_id):
         session['quiz_incorrect'] = 0  # Reset this on start
         session['quiz_start_time'] = time.time()
         session.pop('quiz_completed', None)  # Remove the completed flag if it exists
+        session.pop('last_feedback', None)  # Clear last question feedback
 
     shuffled_card_ids = session['shuffled_cards']
     current_card_index = session['current_card_index']
@@ -184,15 +185,26 @@ def practice(deck_id):
             session['quiz_incorrect'] += 1
             if current_card.id not in session['incorrect_card_ids']:
                 session['incorrect_card_ids'].append(current_card.id)
-            flash(f'Wrong! The correct answer was: {current_card.answer}', 'incorrect')
+            session['last_feedback'] = f'Wrong! The correct answer was: {current_card.answer}'
         else:
-            flash('Correct!', 'correct')
+            session['last_feedback'] = 'Correct!'
 
-        # Move to the next question
         session['current_card_index'] += 1
+
+        # If the quiz is now completed, show feedback before results
+        if session['current_card_index'] >= len(shuffled_card_ids):
+            return redirect(url_for('practice', deck_id=deck.id))
+
         return redirect(url_for('practice', deck_id=deck.id))
 
-    return render_template('practice.html', deck=deck, current_card=current_card, index=current_card_index)
+    last_feedback = session.pop('last_feedback', None)  # Show last feedback only once
+    return render_template(
+        'practice.html',
+        deck=deck,
+        current_card=current_card,
+        index=current_card_index,
+        last_feedback=last_feedback
+    )
 
 @app.route('/deck/<int:deck_id>/result')
 def result(deck_id):
