@@ -118,14 +118,14 @@
         }
 
         .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
+            background-color: #e0ffe0; /* Very Light Green */
+            border-color: #d4f5d4;
             color: #155724;
         }
 
         .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+            background-color: #ffe0e0; /* Very Light Red */
+            border-color: #f5d4d4;
             color: #721c24;
         }
 
@@ -154,10 +154,13 @@
         <a href="{{ url_for('deck', deck_id=deck.id) }}" class="btn-back">Back to Deck</a>
         <h1>Practice: {{ deck.name }}</h1>
 
-        <!-- Show feedback for the last question -->
+        <!-- Show feedback for the last question before redirecting to results -->
         {% if last_feedback %}
-            <div class="alert alert-info">
+            <div class="alert {{ 'alert-success' if last_feedback == 'Correct!' else 'alert-danger' }}">
                 {{ last_feedback }}
+                {% if last_feedback == 'Wrong!' %}
+                    <p>The correct answer was: {{ correct_answer }}</p>
+                {% endif %}
             </div>
         {% endif %}
 
