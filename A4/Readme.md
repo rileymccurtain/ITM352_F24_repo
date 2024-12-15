@@ -36,6 +36,7 @@ Utilizing Flashcards
 3. Answer the question and receive immediate feedback. 
 
 Viewing Results 
+
 After completing a quiz, the results page displays: 
 - Time spent in minutes. 
 - Percentage accuracy. 
