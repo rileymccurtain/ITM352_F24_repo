@@ -38,7 +38,7 @@ Utilizing Flashcards
 Viewing Results 
 
 After completing a quiz, the results page displays: 
-- Time spent in minutes. 
-- Percentage accuracy. 
-- The number of incorrect answers. 
-- An overview of card difficulty ratings. 
+- Time spent in minutes
+- Percentage accuracy
+- The number of incorrect answers
+- An overview of card difficulty ratings
