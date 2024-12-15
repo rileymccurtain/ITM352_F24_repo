@@ -10,6 +10,8 @@ Features
 - Quiz Mode: Attempt randomized quizzes with flashcards in sequential difficulty order, including easy, medium, and hard, and receive prompt feedback.
 - Result Display: Access quiz results, including accuracy, time spent, and progress by difficulty level.
 
+Technical Specifications: This application is reliant on Python 3.8+, Flask 2.0+, and pip.
+
 Applied Instrumentation 
 - Backend: Flask
 - Database: SQLite 
