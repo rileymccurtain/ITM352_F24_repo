@@ -19,6 +19,7 @@ Applied Instrumentation
 - Security: Werkzeug for password hashing
 
 A Manual to Operating the Application
+
 Adding a Deck 
 1. Navigate to the home page. 
 2. Choose a title for the deck under “Deck Name:” and click “Create Deck.”
